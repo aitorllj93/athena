@@ -1,0 +1,116 @@
+{
+  "codes": {
+    "0": {
+      "day": "Soleado",
+      "night": "Despejado"
+    },
+    "1": {
+      "day": "Mayormente Soleado",
+      "night": "Mayormente Despejado"
+    },
+    "2": {
+      "day": "Parcialmente Nublado",
+      "night": "Parcialmente Nublado"
+    },
+    "3": {
+      "day": "Nublado",
+      "night": "Nublado"
+    },
+    "45": {
+      "day": "Brumoso",
+      "night": "Brumoso"
+    },
+    "48": {
+      "day": "Niebla Escarchada",
+      "night": "Niebla Escarchada"
+    },
+    "51": {
+      "day": "Llovizna Leve",
+      "night": "Llovizna Leve"
+    },
+    "53": {
+      "day": "Llovizna",
+      "night": "Llovizna"
+    },
+    "55": {
+      "day": "Llovizna Pesada",
+      "night": "Llovizna Pesada"
+    },
+    "56": {
+      "day": "Llovizna Congelante Leve",
+      "night": "Llovizna Congelante Leve"
+    },
+    "57": {
+      "day": "Llovizna Congelante",
+      "night": "Llovizna Congelante"
+    },
+    "61": {
+      "day": "Lluvia Ligera",
+      "night": "Lluvia Ligera"
+    },
+    "63": {
+      "day": "Lluvia",
+      "night": "Lluvia"
+    },
+    "65": {
+      "day": "Lluvia Pesada",
+      "night": "Lluvia Pesada"
+    },
+    "66": {
+      "day": "Lluvia Congelante Ligera",
+      "night": "Lluvia Congelante Ligera"
+    },
+    "67": {
+      "day": "Lluvia Congelante",
+      "night": "Lluvia Congelante"
+    },
+    "71": {
+      "day": "Nieve Ligera",
+      "night": "Nieve Ligera"
+    },
+    "73": {
+      "day": "Nieve",
+      "night": "Nieve"
+    },
+    "75": {
+      "day": "Fuertes Nevadas",
+      "night": "Fuertes Nevadas"
+    },
+    "77": {
+      "day": "Granos de Nieve",
+      "night": "Granos de Nieve"
+    },
+    "80": {
+      "day": "Lluvias Ligeras",
+      "night": "Lluvias Ligeras"
+    },
+    "81": {
+      "day": "Chubascos",
+      "night": "Chubascos"
+    },
+    "82": {
+      "day": "Lluvias Intensas",
+      "night": "Lluvias Intensas"
+    },
+    "85": {
+      "day": "Lluvias de Nieve Ligeras",
+      "night": "Lluvias de Nieve Ligeras"
+    },
+    "86": {
+      "day": "Lluvias de Nieve",
+      "night": "Lluvias de Nieve"
+    },
+    "95": {
+      "day": "Tormenta",
+      "night": "Tormenta"
+    },
+    "96": {
+      "day": "Tormentas Ligeras con Granizo",
+      "night": "Tormentas Ligeras con Granizo"
+    },
+    "99": {
+      "day": "Tormenta con Granizo",
+      "night": "Tormenta con Granizo"
+    }
+  }
+}
