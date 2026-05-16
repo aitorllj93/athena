@@ -1,6 +1,6 @@
 import { DEFAULT_FORMAT } from "@/lib/constants";
 import type { Format } from "@/lib/types";
-import { human } from "@/lib/utils/date";
+import { formatDistance } from "@/lib/utils/date";
 
 import type { MailMessage } from "./types";
 
@@ -19,11 +19,11 @@ function formatRegular(message: MailMessage) {
   const fromAddress = message.envelope?.from?.[0]?.address;
   const subject = message.envelope?.subject?.trim();
 
-	return `${human(date)}: ${fromName}<${fromAddress}>: ${subject} (ID: ${message.uid})`;
+	return `${formatDistance(date)}: ${fromName}<${fromAddress}>: ${subject} (ID: ${message.uid})`;
 }
 
 function formatMinimal(message: MailMessage) {
-	return `${human(message.envelope?.date)}: ${message.envelope?.from?.[0]?.name}<${message.envelope?.from?.[0]?.address}>: ${message.envelope?.subject?.trim()}`;
+	return `${formatDistance(message.envelope?.date)}: ${message.envelope?.from?.[0]?.name}<${message.envelope?.from?.[0]?.address}>: ${message.envelope?.subject?.trim()}`;
 }
 
 export function formatMailMessage(message: MailMessage, format: Format = DEFAULT_FORMAT) {
