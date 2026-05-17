@@ -1,9 +1,11 @@
 import { getTranslations } from "@/lib/i18n";
 import { formatMinutes } from "@/lib/utils/date";
+import type { Group } from "@/lib/utils/group";
 import {
 	type DisplayFieldDefinition,
 	type Format,
 	render,
+	renderGroup,
 } from "@/lib/utils/render";
 import type { Task, TaskFields } from "./types";
 
@@ -102,4 +104,24 @@ export async function formatTasks(
 		fields: fields as TaskFields[],
 		format,
 	});
+}
+
+export async function formatTasksGroups(
+	groups: Group<Task>[],
+	format?: Format,
+	fields?: TaskFields[],
+) {
+	const colDefs = await getColumnDefs();
+	let out = "";
+
+	for (const group of groups) {
+		out += await renderGroup(group.key as string, group.items, {
+			columnDefinitions: colDefs,
+			fields,
+			format,
+		});
+		out += "\n\n";
+	}
+
+	return out;
 }

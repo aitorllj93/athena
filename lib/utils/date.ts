@@ -39,11 +39,27 @@ function diffDays(a: Date, b: Date) {
 	return Math.round((utc1 - utc2) / MS_PER_DAY);
 }
 
+export function yesterday() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
+
+  return yesterday;
+}
+
 export function today() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   return today;
+}
+
+export function tomorrow() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  return tomorrow;
 }
 
 /**
@@ -102,6 +118,17 @@ export function formatRelative(date: Date) {
   }
 
   return capitalize(dateFormatter.format(date));
+}
+
+/**
+ * Returns full date
+ * examples: 
+ * - 2026-05-17
+ */
+export function formatISODate(date: Date | number | string, lang = language) {
+  return format(date, 'yyyy-MM-dd', {
+    locale: locales.get(lang)
+  })
 }
 
 

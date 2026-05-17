@@ -1,20 +1,17 @@
 import { formatISODate } from "@/lib/utils/date";
-import type { Group, GroupByParams } from "@/lib/utils/group";
+import type { GroupByParams } from "@/lib/utils/group";
 import type { Pagination, PaginationParams } from "@/lib/utils/pagination";
 import { DisposableCollection } from "./collection";
 import { hasStatus, isDue, isScheduled } from "./filters";
-import { type QueryResultGroup, type QueryResultTask, type Task, toTask, toTaskGroup } from "./types";
+import { type QueryResultTask, type Task, toTask } from "./types";
 
-type ListScheduledTasksParams = {
+type ListPastTasksParams = {
 	groupBy?: GroupByParams;
 	pagination?: PaginationParams;
 	date: Date;
 };
-export async function listScheduledTasks(
-	params: ListScheduledTasksParams,
-): Promise<{
-	data?: Task[];
-	groups?:  Group<Task>[];
+export async function listPastTasks(params: ListPastTasksParams): Promise<{
+	data: Task[];
 	page: Pagination;
 }> {
 	const referenceDate = formatISODate(params.date);
@@ -25,7 +22,7 @@ export async function listScheduledTasks(
 	await using db = await DisposableCollection.open();
 
 	const query = await db.collection.query({
-		group_by: params.groupBy,
+    group_by: params.groupBy,
 		types: ["task"],
 		limit,
 		offset,
@@ -39,14 +36,11 @@ export async function listScheduledTasks(
 		},
 	});
 
-	const data = ((query.results as QueryResultTask[]) ?? [])?.map(toTask);
-	const groups = (query.groups as QueryResultGroup<QueryResultTask>[])?.map(toTaskGroup);
-
+	const data = ((query.results as QueryResultTask[]) ?? []).map(toTask);
 	const total = query.meta?.total_count ?? data.length;
 
 	return {
 		data,
-		groups,
 		page: {
 			page,
 			limit,

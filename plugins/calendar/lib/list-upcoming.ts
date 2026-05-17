@@ -1,5 +1,6 @@
 import ms from "ms";
-
+import { type Group, type GroupByParams, groupBy } from "@/lib/utils/group";
+import { type DeepKeys, getValue } from "@/lib/utils/object";
 import { orderBy } from "@/lib/utils/order";
 import {
 	type Pagination,
@@ -7,7 +8,6 @@ import {
 	paginate,
 } from "@/lib/utils/pagination";
 import { listCalendars } from "./list-calendars";
-
 import {
 	type CalendarClient,
 	type CalendarEvent,
@@ -15,6 +15,7 @@ import {
 } from "./types";
 
 type ListUpcomingParams = {
+	groupBy?: GroupByParams;
 	pagination?: PaginationParams;
 	days?: number;
 };
@@ -22,7 +23,8 @@ export async function listUpcomingEvents(
 	client: CalendarClient,
 	params: ListUpcomingParams,
 ): Promise<{
-	data: CalendarEvent[];
+	data?: CalendarEvent[];
+	groups?: Group<CalendarEvent>[];
 	page: Pagination;
 }> {
 	const days = params.days ?? 7;
@@ -49,9 +51,53 @@ export async function listUpcomingEvents(
 	const sorted = orderBy(events, [
 		{
 			key: "startTime",
-			order: "desc",
+			order: "asc",
 		},
 	]);
 
-	return paginate(sorted ?? [], params.pagination);
+	const groups = params.groupBy ? groupBy(
+		sorted,
+		(event) => {
+			if (params.groupBy?.property === "startDate") {
+				const start = event.startDate ?? event.endDate;
+
+				if (!start) {
+					return "unknown";
+				}
+
+				return start.toISOString().slice(0, 10);
+			}
+
+			const value = getValue(
+				event,
+				params.groupBy?.property as DeepKeys<typeof event>,
+			);
+
+			return value?.toString() ?? "";
+		},
+		{
+			sortGroups: (a, b) => {
+				if (a && b) {
+					return a.toString().localeCompare(b.toString());
+				}
+
+				if (a) {
+					return -1;
+				}
+
+				if (b) {
+					return 1;
+				}
+
+				return 0;
+			},
+		},
+	) : undefined;
+
+	const result = paginate(sorted ?? [], params.pagination);
+
+	return {
+		...result,
+		groups
+	}
 }

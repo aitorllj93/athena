@@ -52,13 +52,22 @@ export async function morningBriefCommand(
 		PluginRegistry.runCommand("weather.getForecast").catch(
 			() => "Weather plugin not installed",
 		),
-		PluginRegistry.runCommand("calendar.listUpcomingEvents").catch(
+		PluginRegistry.runCommand("calendar.listUpcomingEvents", {
+			fields: ["startTime", "summary", "id"],
+			groupBy: {
+				property: "startDate"
+			}
+		}).catch(
 			() => "Calendar plugin not installed",
 		),
 		PluginRegistry.runCommand("mail.listUnreadMails").catch(
 			() => "Mail plugin not installed",
 		),
-		PluginRegistry.runCommand("tasks.listScheduledTasks").catch(
+		PluginRegistry.runCommand("tasks.listScheduledTasks", {
+			groupBy: {
+				property: "block"
+			} 
+		}).catch(
 			() => "Tasks plugin not installed",
 		),
 	]);

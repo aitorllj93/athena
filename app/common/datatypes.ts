@@ -17,9 +17,17 @@ export const format = z.enum([
 export const limit = z.int();
 export const page = z.int().default(1);
 
+export const groupBy = z.string();
+export const groupByDirection = z.enum([
+  "desc",
+  "asc"
+]).optional().default("desc")
+
 export default {
   fields,
   format,
+  groupBy,
+  groupByDirection,
   limit,
   page,
 }

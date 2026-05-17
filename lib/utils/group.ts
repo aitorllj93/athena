@@ -1,4 +1,10 @@
-type GroupedResult<K, T> = {
+
+export type GroupByParams = {
+  property: string;
+  direction?: "asc" | "desc"
+};
+
+export type Group<T, K extends PropertyKey = PropertyKey> = {
   key: K;
   items: T[];
 };
@@ -10,7 +16,7 @@ export function groupBy<T, K extends PropertyKey>(
     sortGroups?: (a: K, b: K) => number;
     sortItems?: (a: T, b: T) => number;
   }
-): GroupedResult<K, T>[] {
+): Group<T, K>[] {
   const map = new Map<K, T[]>();
 
   for (const item of list) {

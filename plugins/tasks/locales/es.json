@@ -1,5 +1,5 @@
 {
-  "unreadCount": "Hay {{total}} tareas sin completar",
+  "unreadCount": "Hay {{total}} tareas pendientes",
   "fields": {
     "block": "Bloque",
     "blockedBy": "Bloqueada por",

@@ -14,15 +14,20 @@ const calendar = router({
 		)
 		.query(async ({ input }) => {
 			return listUpcomingEventsCommand({
-				fields: input.fields as CalendarEventFields[],
+				fields: (input.fields ?? ["startTime", "summary", "id"]) as CalendarEventFields[],
 				format: input.format,
+				groupBy: {
+					"property": "startDate",
+				}
 			});
 		}),
-	listEvents: procedure
+	upcoming: procedure
 		.input(
 			z.object({
 				fields: datatypes.fields,
 				format: datatypes.format,
+				groupBy: datatypes.groupBy.optional(),
+				groupByDirection: datatypes.groupByDirection,
 				limit: datatypes.limit.default(10),
 				page: datatypes.page,
 			}),
@@ -31,6 +36,12 @@ const calendar = router({
 			return listUpcomingEventsCommand({
 				fields: input.fields as CalendarEventFields[],
 				format: input.format,
+				groupBy: input.groupBy
+					? {
+							property: input.groupBy,
+							direction: input.groupByDirection,
+						}
+					: undefined,
 				pagination: {
 					limit: input.limit,
 					page: input.page,
