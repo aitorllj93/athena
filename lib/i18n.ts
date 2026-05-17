@@ -1,6 +1,73 @@
 import i18next from "i18next";
 import resourcesToBackend from "i18next-resources-to-backend";
 
+type Language = "en" | "es";
+type Namespace = "auth" | "calendar" | "common" | "mail" | "morning" | "tasks" | "weather";
+
+const translations: Record<Language, Record<Namespace, any>> = {
+	es: {
+		auth: () =>
+			import("locales/es/auth.json", {
+				with: { type: "json" },
+			}),
+		calendar: () =>
+			import("locales/es/calendar.json", {
+				with: { type: "json" },
+			}),
+		common: () =>
+			import("locales/es/common.json", {
+				with: { type: "json" },
+			}),
+		mail: () =>
+			import("locales/es/mail.json", {
+				with: { type: "json" },
+			}),
+		morning: () =>
+			import("locales/es/morning.json", {
+				with: { type: "json" },
+			}),
+		tasks: () =>
+			import("locales/es/tasks.json", {
+				with: { type: "json" },
+			}),
+		weather: () =>
+			import("locales/es/weather.json", {
+				with: { type: "json" },
+			}),
+	},
+	en: {
+		auth: () =>
+			import("locales/en/auth.json", {
+				with: { type: "json" },
+			}),
+		calendar: () =>
+			import("locales/en/calendar.json", {
+				with: { type: "json" },
+			}),
+		common: () =>
+			import("locales/en/common.json", {
+				with: { type: "json" },
+			}),
+		mail: () =>
+			import("locales/en/mail.json", {
+				with: { type: "json" },
+			}),
+		morning: () =>
+			import("locales/en/morning.json", {
+				with: { type: "json" },
+			}),
+		tasks: () =>
+			import("locales/en/tasks.json", {
+				with: { type: "json" },
+			}),
+		weather: () =>
+			import("locales/en/weather.json", {
+				with: { type: "json" },
+			}),
+	},
+}
+
+
 function detectLanguage() {
 	const lang = process.env.LC_ALL || process.env.LANG || "en";
 
@@ -10,10 +77,8 @@ function detectLanguage() {
 await i18next
 	.use(
 		resourcesToBackend(
-			(language: string, namespace: string) =>
-				import(`locales/${language}/${namespace}.json`, {
-					with: { type: "json" },
-				}),
+			(language: Language, namespace: Namespace) =>
+				translations[language]?.[namespace]?.()
 		),
 	)
 	.init({
