@@ -1,39 +1,56 @@
-import { DEFAULT_FORMAT } from "@/lib/constants";
-import type { Format } from "@/lib/types";
+import { getTranslations } from "@/lib/i18n";
 import { formatDistance } from "@/lib/utils/date";
+import {
+	type DisplayFieldDefinition,
+	type Format,
+	render,
+} from "@/lib/utils/render";
 
-import type { MailMessage } from "./types";
+import type { MailMessage, MailMessageFields } from "./types";
 
-function formatXML(message: MailMessage) {
-	return `<mail>
-  <uid>${message.uid}</uid>
-  <subject>${message.envelope?.subject?.trim()}</subject>
-  <date>${message.envelope?.date}</date>
-  <from>${message.envelope?.from?.[0]?.name}<${message.envelope?.from?.[0]?.address}></from>
-</mail>`;
-}
+const { t } = await getTranslations("mail");
 
-function formatRegular(message: MailMessage) {
-  const date = message.envelope?.date;
-  const fromName = message.envelope?.from?.[0]?.name;
-  const fromAddress = message.envelope?.from?.[0]?.address;
-  const subject = message.envelope?.subject?.trim();
+type FieldMap = {
+	[K in MailMessageFields]: DisplayFieldDefinition<MailMessage, K>;
+};
 
-	return `${formatDistance(date)}: ${fromName}<${fromAddress}>: ${subject} (ID: ${message.uid})`;
-}
+const COLUMN_DEFS_MAP = new Map<MailMessageFields, FieldMap[MailMessageFields]>(
+	[
+		[
+			"subject",
+			{ key: "subject", label: t("fields.subject"), format: (v) => `${v}` },
+		],
+		[
+			"sender",
+			{
+				key: "sender",
+				label: t("fields.sender"),
+				format: (v) => (v.name ? `${v.name}<${v.address}>` : v.address),
+			},
+		],
+		[
+			"received",
+			{
+				key: "received",
+				label: t("fields.received"),
+				format: (v) => formatDistance(v),
+			},
+		],
+		["id", { key: "id", label: t("fields.id"), format: (v) => `#${v}` }],
+	],
+);
+const COLUMN_DEFS = Array.from(
+	COLUMN_DEFS_MAP.values(),
+) as DisplayFieldDefinition<MailMessage>[];
 
-function formatMinimal(message: MailMessage) {
-	return `${formatDistance(message.envelope?.date)}: ${message.envelope?.from?.[0]?.name}<${message.envelope?.from?.[0]?.address}>: ${message.envelope?.subject?.trim()}`;
-}
-
-export function formatMailMessage(message: MailMessage, format: Format = DEFAULT_FORMAT) {
-  if (format === "xml") {
-    return formatXML(message);
-  }
-
-  if (format === "regular") {
-    return formatRegular(message);
-  }
-
-	return formatMinimal(message);
+export function formatMailMessages(
+	messages: MailMessage[],
+	format?: Format,
+	fields?: MailMessageFields[],
+) {
+	return render(messages, {
+		columnDefinitions: COLUMN_DEFS,
+		fields: fields as MailMessageFields[],
+		format,
+	});
 }

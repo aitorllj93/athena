@@ -1,4 +1,5 @@
 
+export const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 
 export const WEATHER_ICONS = {
 	0: {

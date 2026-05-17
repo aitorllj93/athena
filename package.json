@@ -17,9 +17,10 @@
   },
   "scripts": {
     "dev": "bun run cli.ts",
-    "build": "bun build --compile src/cli.ts --outfile dist/cli"
+    "build": "bun build --compile cli.ts --outfile dist/cli"
   },
   "dependencies": {
+    "@callumalpass/mdbase": "^0.2.2",
     "@logtape/file": "^2.0.7",
     "@logtape/logtape": "^2.0.7",
     "@logtape/pretty": "^2.0.7",

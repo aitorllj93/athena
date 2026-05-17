@@ -1,3 +1,9 @@
 {
-  "unreadCount": "Hay {{total}} mensajes sin leer"
+  "unreadCount": "Hay {{total}} mensajes sin leer",
+  "fields": {
+    "sender": "De",
+    "received": "Fecha",
+    "subject": "Asunto",
+    "id": "ID"
+  }
 }

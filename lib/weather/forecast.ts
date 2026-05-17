@@ -1,3 +1,4 @@
+import { FORECAST_URL } from "./constants";
 import type { Forecast } from "./types";
 
 type ForecastParams = {
@@ -18,7 +19,7 @@ export async function forecast(params: ForecastParams): Promise<Forecast> {
 
 	const { lat, lng } = params.geolocation;
 
-	const url = new URL("https://api.open-meteo.com/v1/forecast");
+	const url = new URL(FORECAST_URL);
 	url.searchParams.append("latitude", lat.toString());
 	url.searchParams.append("longitude", lng.toString());
 	url.searchParams.append(

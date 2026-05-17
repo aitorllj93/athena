@@ -1,22 +1,41 @@
 import z from "zod";
 import { listUnreadMailsCommand } from "@/commands/list-unread-mails";
+import type { MailMessageFields } from "@/lib/mail";
 import { procedure, router } from "@/lib/trpc";
 
+import { datatypes } from "./common";
+
 const mail = router({
-	inbox: procedure.query(async () => {
-		return listUnreadMailsCommand();
-	}),
-	listUnread: procedure
-		.input(z.object({ 
-			limit: z.number().default(50),
-			page: z.number().default(1), 
-		}))
+	inbox: procedure
+		.input(
+			z.object({
+				fields: datatypes.fields,
+				format: datatypes.format,
+			}),
+		)
 		.query(async ({ input }) => {
-			return listUnreadMailsCommand({ 
+			return listUnreadMailsCommand({
+				fields: input.fields as MailMessageFields[],
+				format: input.format,
+			});
+		}),
+	listUnread: procedure
+		.input(
+			z.object({
+				fields: datatypes.fields,
+				format: datatypes.format,
+				limit: datatypes.limit.default(50),
+				page: datatypes.page,
+			}),
+		)
+		.query(async ({ input }) => {
+			return listUnreadMailsCommand({
+				fields: input.fields as MailMessageFields[],
+				format: input.format,
 				pagination: {
 					limit: input.limit,
 					page: input.page,
-				}
+				},
 			});
 		}),
 	markRead: procedure

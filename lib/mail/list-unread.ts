@@ -4,7 +4,7 @@ import {
 	paginate,
 } from "@/lib/utils/pagination";
 import { type OrderFields, orderBy } from "../utils/order";
-import type { MailClient, MailMessage } from "./types";
+import { type MailClient, type MailMessage, toMailMessage } from "./types";
 
 type ListUnreadParams = {
 	pagination?: PaginationParams;
@@ -18,10 +18,7 @@ export async function listUnreadMails(
 	page: Pagination;
 }> {
 	const unseenUids = await client.search({ seen: false }, { uid: true });
-	const { data: uuids, page } = paginate(
-		unseenUids || [],
-		params.pagination,
-	);
+	const { data: uuids, page } = paginate(unseenUids || [], params.pagination);
 
 	if (uuids.length === 0) {
 		return {
@@ -30,19 +27,21 @@ export async function listUnreadMails(
 		};
 	}
 
-	const messages = await client.fetchAll(
-		uuids,
-		{
-			envelope: true,
-			source: true,
-		},
-		{ uid: true },
-	);
+	const messages = (
+		await client.fetchAll(
+			uuids,
+			{
+				envelope: true,
+				source: true,
+			},
+			{ uid: true },
+		)
+	).map(toMailMessage);
 
 	return {
 		data: orderBy(messages, [
 			{
-				key: "envelope.date",
+				key: "received",
 				order: "desc",
 			},
 		]),

@@ -39,6 +39,13 @@ function diffDays(a: Date, b: Date) {
 	return Math.round((utc1 - utc2) / MS_PER_DAY);
 }
 
+export function today() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return today;
+}
+
 /**
  * Returns distance from now
  * examples: 
@@ -105,4 +112,26 @@ export function formatRelative(date: Date) {
  */
 export function formatFullDate(date: Date | number | string) {
   return capitalize(fullDateFormat.format(new Date(date)));
+}
+
+/**
+ * Returns humanized minutes
+ */
+export function formatMinutes(minutes?: number) {
+  if (!minutes || minutes <= 0) return '—';
+
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+
+  // Usa Intl.NumberFormat para plurales localizados (ej: "1 hora" vs "2 horas")
+  const fmt = (value: number, unit: 'minute' | 'hour') =>
+    new Intl.NumberFormat(language, {
+      style: 'unit',
+      unit,
+      unitDisplay: 'narrow',
+    }).format(value);
+
+  if (h === 0) return fmt(m, 'minute');
+  if (m === 0) return fmt(h, 'hour');
+  return `${fmt(h, 'hour')} ${fmt(m, 'minute')}`;
 }

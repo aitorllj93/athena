@@ -1,85 +1,98 @@
+import { getTranslations } from "@/lib/i18n";
 import { formatRelative, formatTime } from "@/lib/utils/date";
-import { DEFAULT_FORMAT } from "../constants";
-import type { Format } from "../types";
-import type { CalendarEvent } from "./types";
+import {
+	type DisplayFieldDefinition,
+	type Format,
+	render,
+	renderGroup,
+} from "@/lib/utils/render";
 
-function formatEventTime(event: CalendarEvent) {
-	const start = event.start?.dateTime ? formatTime(event.start.dateTime) : null;
-	const end = event.end?.dateTime ? formatTime(event.end.dateTime) : null;
+import type { CalendarEvent, CalendarEventFields } from "./types";
 
-	if (!start) {
-		return "";
-	}
+const { t } = await getTranslations("calendar");
 
-	if (!end) {
-		return `${start}`;
-	}
+type FieldMap = {
+	[K in CalendarEventFields]: DisplayFieldDefinition<CalendarEvent, K>;
+};
 
-	return `${start} - ${end}`;
-}
+const COLUMN_DEFS_MAP = new Map<
+	CalendarEventFields,
+	FieldMap[CalendarEventFields]
+>([
+	[
+		"startDate",
+		{
+			key: "startDate",
+			label: t("fields.startDate"),
+			format: (_, obj) => {
+				if (!obj.startDate) {
+					return "";
+				}
 
-function formatMinimal(event: CalendarEvent) {
-	const time = formatEventTime(event);
+				return formatRelative(obj.startDate);
+			},
+		},
+	],
+	[
+		"startTime",
+		{
+			key: "startTime",
+			label: t("fields.startTime"),
+			format: (_, obj) => {
+				if (!obj.startTime) {
+					return "";
+				}
 
-	return time ? `${time} ${event.summary}` : event.summary;
-}
+				if (!obj.endTime) {
+					return formatTime(obj.startTime);
+				}
 
-function formatRegular(event: CalendarEvent) {
-	const time = formatEventTime(event);
+				return `${formatTime(obj.startTime)} - ${formatTime(obj.endTime)}`;
+			},
+		},
+	],
+	[
+		"summary",
+		{
+			key: "summary",
+			label: t("fields.summary"),
+			format: (v) => v ?? "",
+		},
+	],
+	[
+		"id",
+		{
+			key: "id",
+			label: t("fields.id"),
+			format: (v) => `#${v}`,
+		},
+	],
+]);
+const COLUMN_DEFS = Array.from(
+	COLUMN_DEFS_MAP.values(),
+) as DisplayFieldDefinition<CalendarEvent>[];
 
-	return `${time ? `${time} ` : ""}${event.summary} (ID: ${event.id})`;
-}
-
-function formatXML(event: CalendarEvent) {
-	return `<event>
-  <uid>${event.id}</uid>
-  <summary>${event.summary}</summary>
-  <start>${event.start?.dateTime ?? event.start?.date}</start>
-  <end>${event.start?.dateTime ?? event.end?.date}</end>
-</event>`;
-}
-
-export function formatEvent(
-	event: CalendarEvent,
-	format: Format = DEFAULT_FORMAT,
+export function formatCalendarEvents(
+	events: CalendarEvent[],
+	format?: Format,
+	fields?: CalendarEventFields[],
 ) {
-	if (format === "xml") {
-		return formatXML(event);
-	}
-
-	if (format === "regular") {
-		return formatRegular(event);
-	}
-
-	return formatMinimal(event);
+	return render(events, {
+		columnDefinitions: COLUMN_DEFS,
+		fields: fields as CalendarEventFields[],
+		format,
+	});
 }
 
-function formatGroupMinimal(group: Date) {
-	return formatRelative(group);
-}
-
-function formatGroupRegular(group: Date) {
-	return `- ${formatRelative(group)}
-`;
-}
-
-function formatGroupXML(group: string | number | Date) {
-	return `<group>
-${group}
-</group>`;
-}
-
-export function formatGroup(
-	date: string | number | Date,
-	format: Format = DEFAULT_FORMAT,
+export function formatCalendarEventsGroup(
+	title: string,
+	events: CalendarEvent[],
+	format?: Format,
+	fields?: CalendarEventFields[],
 ) {
-	if (format === "xml") {
-		return formatGroupXML(date);
-	}
-
-	if (format === "regular") {
-		return formatGroupRegular(new Date(date));
-	}
-
-	return formatGroupMinimal(new Date(date));
+	return renderGroup(title, events, {
+		columnDefinitions: COLUMN_DEFS,
+		fields: fields as CalendarEventFields[],
+		format,
+	});
 }

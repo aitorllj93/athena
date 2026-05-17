@@ -2,9 +2,6 @@ import { mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import ms from "ms";
-import type { Format } from "./types";
-
-export const DEFAULT_FORMAT: Format = "regular";
 
 export const CONFIG_DIRECTORY = join(homedir(), ".athena");
 export const LOGS_DIRECTORY = join(CONFIG_DIRECTORY, "logs");
