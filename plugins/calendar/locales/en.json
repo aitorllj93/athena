@@ -1,0 +1,8 @@
+{
+  "fields": {
+    "startDate": "Date",
+    "startTime": "Time",
+    "summary": "Summary",
+    "id": "ID"
+  }
+}

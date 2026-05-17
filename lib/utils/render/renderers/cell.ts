@@ -44,7 +44,7 @@ export function renderCell<TObject>(
 	format?: boolean,
 ): string {
 	const raw = getValue(item, col.key);
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: useful for json rendering
 	if (!format) return raw as any;
 	if (col.format) return col.format(raw, item).trim();
 	return formatValue(raw).trim();

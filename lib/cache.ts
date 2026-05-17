@@ -1,16 +1,21 @@
 import crypto from "node:crypto";
 import cacache from "cacache";
+import stringify from "fast-json-stable-stringify";
 
 import { CACHE_DIR, DEFAULT_CACHE_TTL } from "./constants";
 
 export function memo<TArgs extends unknown[], TResult>(
 	fn: (...args: TArgs) => Promise<TResult>,
 	ttlMs = DEFAULT_CACHE_TTL,
+	keyPrefix?: string,
 ) {
+	if (!keyPrefix) {
+		console.warn(`WARNING: keyPrefix not found, falling back to \`fn.name\` "${fn.name}" this behavior might fail on compilation builds`);
+	}
 	return async (...args: TArgs): Promise<TResult> => {
 		const key = crypto
 			.createHash("sha1")
-			.update(fn.name + JSON.stringify(args))
+			.update((keyPrefix ?? fn.name) + stringify(args))
 			.digest("hex");
 
 		try {

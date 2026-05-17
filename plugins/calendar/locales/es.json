@@ -1,0 +1,8 @@
+{
+  "fields": {
+    "startDate": "Fecha",
+    "startTime": "Hora",
+    "summary": "Descripción",
+    "id": "ID"
+  }
+}

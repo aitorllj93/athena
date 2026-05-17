@@ -1,9 +1,0 @@
-{
-  "unreadCount": "Found {{total}} unread messages",
-  "fields": {
-    "sender": "From",
-    "received": "Date",
-    "subject": "Subject",
-    "id": "ID"
-  }
-}

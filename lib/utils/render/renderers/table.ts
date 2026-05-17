@@ -6,7 +6,7 @@ export function renderMdTable<TObject>(
 	columns: DisplayFieldDefinition<TObject>[],
 	{
 		includeKeys = true,
-		formatKeys = false,
+		formatKeys = true,
 		formatValues = true,
 	}: RenderOptions = {},
 ): string {
@@ -16,7 +16,7 @@ export function renderMdTable<TObject>(
 	const lines: string[] = [];
 
 	if (includeKeys) {
-		lines.push(row(columns.map((c) => c.label)));
+		lines.push(row(columns.map((c) => formatKeys ? c.label : c.key)));
 		lines.push(row(columns.map(() => "---")));
 	}
 

@@ -3,6 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "plugins/*"
+  ],
   "devDependencies": {
     "@types/bun": "latest",
     "@types/cacache": "^20.0.1",
@@ -17,7 +20,7 @@
   },
   "scripts": {
     "dev": "bun run cli.ts",
-    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/cli cli.ts"
+    "build": "bun build --compile --compile-autoload-tsconfig --compile-autoload-package-json --minify-whitespace --minify-syntax --target bun --outfile dist/cli cli.ts"
   },
   "dependencies": {
     "@callumalpass/mdbase": "^0.2.2",
@@ -25,9 +28,15 @@
     "@logtape/logtape": "^2.0.7",
     "@logtape/pretty": "^2.0.7",
     "@trpc/server": "^11.17.0",
+    "athena-plugin-calendar": "workspace:*",
+    "athena-plugin-mail": "workspace:*",
+    "athena-plugin-map": "workspace:*",
+    "athena-plugin-morning": "workspace:*",
+    "athena-plugin-weather": "workspace:*",
     "cacache": "^20.0.4",
     "commander": "^14.0.3",
     "date-fns": "^4.1.0",
+    "fast-json-stable-stringify": "^2.1.0",
     "google-auth-library": "^10.6.2",
     "googleapis": "^171.4.0",
     "i18next": "^26.2.0",
@@ -36,6 +45,7 @@
     "ms": "^2.1.3",
     "natural-orderby": "^5.0.0",
     "trpc-cli": "^0.14.1",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "athena-plugin-tasks": "workspace:*"
   }
 }

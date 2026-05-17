@@ -33,7 +33,17 @@ type GoogleAuthError = {
 
 const { t } = await getTranslations("auth");
 
-let tokens: GoogleTokens | null;
+// Shared state container on globalThis to support compiled binaries
+const state = {
+	get tokens(): GoogleTokens | null {
+		// biome-ignore lint/suspicious/noExplicitAny: access globalThis property
+		return (globalThis as any).__athena_google_tokens__ || null;
+	},
+	set tokens(val: GoogleTokens | null) {
+		// biome-ignore lint/suspicious/noExplicitAny: write globalThis property
+		(globalThis as any).__athena_google_tokens__ = val;
+	}
+};
 
 function getCredentials(): { client_id: string; client_secret: string } {
 	if (!CLIENT_ID) {
@@ -50,22 +60,22 @@ function getCredentials(): { client_id: string; client_secret: string } {
 }
 
 function isTokenExpiringSoon(thresholdMs = ms("30m")) {
-	if (!tokens) {
+	if (!state.tokens) {
 		throw new Error("Undefined tokens");
 	}
 
-	const expiresAt = tokens.received_at + tokens.expires_in * 1000;
+	const expiresAt = state.tokens.received_at + state.tokens.expires_in * 1000;
 
 	const timeLeftMs = expiresAt - Date.now();
 
 	return timeLeftMs < thresholdMs;
 }
 function isRefreshTokenExpiringSoon(thresholdMs = ms("1h")) {
-	if (!tokens) {
+	if (!state.tokens) {
 		throw new Error("Undefined tokens");
 	}
 
-	const expiresAt = tokens.received_at + tokens.expires_in * 1000;
+	const expiresAt = state.tokens.received_at + state.tokens.expires_in * 1000;
 
 	const timeLeftMs = expiresAt - Date.now();
 
@@ -188,19 +198,19 @@ export async function refreshAccessToken(
 }
 
 export async function auth() {
-	tokens = await loadTokens();
+	state.tokens = await loadTokens();
 
-	if (tokens) {
+	if (state.tokens) {
 		if (isTokenExpiringSoon()) {
-			const newTokens = await refreshAccessToken(tokens.refresh_token);
+			const newTokens = await refreshAccessToken(state.tokens.refresh_token);
 			if ("error" in newTokens) {
 				await rm(TOKENS_FILE);
 				throw new Error(newTokens.error_description);
 			}
-			Object.assign(tokens, newTokens);
-			await saveTokens(tokens);
+			Object.assign(state.tokens, newTokens);
+			await saveTokens(state.tokens);
 		}
-		return tokens;
+		return state.tokens;
 	}
 
 	const authUrl = buildAuthUrl();
@@ -209,10 +219,10 @@ export async function auth() {
 
 	const code = await waitForCode();
 
-	tokens = await exchangeCode(code);
+	state.tokens = await exchangeCode(code);
 
-	if (tokens) {
-		await saveTokens(tokens);
+	if (state.tokens) {
+		await saveTokens(state.tokens);
 		console.log(t("savedTokens", { tokensPath: TOKENS_FILE }));
 	}
 }
@@ -226,15 +236,15 @@ export function getUser() {
 }
 
 export function getAccessToken() {
-	if (!tokens) {
+	if (!state.tokens) {
 		throw new Error("Unauthorized. Run auth() first.");
 	}
 
-	return tokens.access_token;
+	return state.tokens.access_token;
 }
 
 export function getOAuthClient(): OAuth2Client {
-	if (!tokens) {
+	if (!state.tokens) {
 		throw new Error("Unauthorized. Run auth() first.");
 	}
 
@@ -246,7 +256,7 @@ export function getOAuthClient(): OAuth2Client {
 	);
 
 	client.setCredentials({
-		access_token: tokens.access_token,
+		access_token: state.tokens.access_token,
 	});
 
 	return client;
