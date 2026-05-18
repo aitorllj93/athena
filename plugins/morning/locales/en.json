@@ -1,4 +1,6 @@
 {
+  "displayName": "Morning",
+  "description": "Receive a morning brief",
   "brief": "Morning Brief",
   "agenda": "Agenda",
   "inbox": "Inbox",

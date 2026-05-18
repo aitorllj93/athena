@@ -1,4 +1,6 @@
 {
+  "displayName": "Calendario",
+  "description": "Visualiza tus próximos eventos",
   "fields": {
     "startDate": "Fecha",
     "startTime": "Hora",

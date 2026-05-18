@@ -1,1 +1,14 @@
-{}
+{
+  "plugins": {
+    "fields": {
+      "installed": "Instalado",
+      "available": "Disponible",
+      "name": "Nombre",
+      "pkgName": "Nombre del Paqueta",
+      "displayName": "Nombre",
+      "version": "Versión",
+      "description": "Descripción",
+      "commands": "Comandos"
+    }
+  }
+}

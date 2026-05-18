@@ -23,12 +23,12 @@ export async function loadPlugins() {
 			...(pkg.devDependencies || {}),
 		};
 
-		const pluginDeps = Object.keys(deps).filter(
-			(name) =>
+		const pluginDeps = Object.entries(deps).filter(
+			([name]) =>
 				name.startsWith("athena-plugin-") || name.startsWith("@athena/plugin-"),
 		);
 
-		for (const depName of pluginDeps) {
+		for (const [depName, depValue] of pluginDeps) {
 			try {
 				// biome-ignore lint/suspicious/noExplicitAny: dynamically loaded ES module
 				let pluginModule: any;
@@ -43,6 +43,7 @@ export async function loadPlugins() {
 				}
 
 				const plugin = pluginModule.default || pluginModule;
+				plugin.isLocal = depValue === "workspace:*";
 
 				if (plugin?.name && plugin.router) {
 					PluginRegistry.register(plugin);

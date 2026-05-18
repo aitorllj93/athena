@@ -1,4 +1,6 @@
 {
+  "displayName": "Mail",
+  "description": "Query your mail inbox",
   "unreadCount": "Found {{total}} unread messages",
   "fields": {
     "sender": "From",

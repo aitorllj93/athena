@@ -1,4 +1,6 @@
 {
+  "displayName": "Tasks",
+  "description": "Interact with your tasks from Obsidian using TaskNotes (mdbase)",
   "unreadCount": "Found {{total}} pending tasks",
   "fields": {
     "block": "Block",

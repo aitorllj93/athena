@@ -15,6 +15,7 @@ export type Format =
 	| "md"
 	| "mdtable"
 	| "mdlist"
+	| "mdlist2"
 	| "mdcheck"
 	| "text"
 	| "csv";

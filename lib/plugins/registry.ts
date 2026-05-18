@@ -1,24 +1,33 @@
 import i18next from "@/lib/i18n";
+import type { DeepKeys } from "../utils/object";
 
-export interface AthenaPlugin {
+export interface Plugin {
   name: string;
+  pkgName?: string;
+  displayName?: string;
+  description?: string;
+  version?: string;
+  installed?: boolean;
+  isLocal?: boolean;
   // biome-ignore lint/suspicious/noExplicitAny: tRPC router type can be complex and dynamic
   router: any;
   // biome-ignore lint/suspicious/noExplicitAny: commands are executable functions with any signature
   commands?: Record<string, (...args: any[]) => any>;
   // Map of language (e.g. 'en', 'es') to translations object
-  locales?: Record<string, Record<string, string | Record<string, string>>>;
+  locales?: Record<PropertyKey, Record<PropertyKey, string | Record<PropertyKey, string>> | unknown>;
 }
+export type PluginFields = DeepKeys<Plugin>;
 
 class PluginRegistryClass {
-  private plugins = new Map<string, AthenaPlugin>();
+  private plugins = new Map<string, Plugin>();
   private commands = new Map<string, (...args: unknown[]) => unknown>();
 
   /**
    * Registers a plugin in the global registry.
    * Registers its commands and injects its local translations into i18next.
    */
-  register(plugin: AthenaPlugin) {
+  register(plugin: Plugin) {
+    plugin.installed = true;
     this.plugins.set(plugin.name, plugin);
 
     // Register cross-plugin commands

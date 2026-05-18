@@ -1,6 +1,7 @@
 import { PluginRegistry } from "@/lib/plugins/registry";
 import { router } from "@/lib/trpc";
-import { pluginRouter } from "./plugin";
+import { cacheRouter } from "./cache";
+import { pluginsRouter } from "./plugins";
 
 /**
  * Dynamically builds the main tRPC router.
@@ -9,7 +10,8 @@ import { pluginRouter } from "./plugin";
 export function createAppRouter() {
 	// biome-ignore lint/suspicious/noExplicitAny: router properties are dynamically registered sub-routers
 	const routes: Record<string, any> = {
-		plugin: pluginRouter,
+		cache: cacheRouter,
+		plugin: pluginsRouter,
 	};
 
 	// Inject each dynamically loaded plugin's router
@@ -23,6 +25,7 @@ export function createAppRouter() {
 
 // Export a base router type for CLI compiler and tooling type safety
 const baseRouter = router({
-	plugin: pluginRouter,
+	cache: cacheRouter,
+	plugins: pluginsRouter,
 });
 export type AppRouter = typeof baseRouter;

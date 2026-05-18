@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
+import { rm } from "node:fs/promises";
 import cacache from "cacache";
 import stringify from "fast-json-stable-stringify";
-
 import { CACHE_DIR, DEFAULT_CACHE_TTL } from "./constants";
 
 export function memo<TArgs extends unknown[], TResult>(
@@ -10,7 +10,9 @@ export function memo<TArgs extends unknown[], TResult>(
 	keyPrefix?: string,
 ) {
 	if (!keyPrefix) {
-		console.warn(`WARNING: keyPrefix not found, falling back to \`fn.name\` "${fn.name}" this behavior might fail on compilation builds`);
+		console.warn(
+			`WARNING: keyPrefix not found, falling back to \`fn.name\` "${fn.name}" this behavior might fail on compilation builds`,
+		);
 	}
 	return async (...args: TArgs): Promise<TResult> => {
 		const key = crypto
@@ -32,4 +34,17 @@ export function memo<TArgs extends unknown[], TResult>(
 		await cacache.put(CACHE_DIR, key, JSON.stringify(result));
 		return result;
 	};
+}
+
+export async function clean(keys?: string[]) {
+	if (keys) {
+		for (const key of keys) {
+			await cacache.rm(CACHE_DIR, key);
+		}
+	} else {
+		await rm(CACHE_DIR, {
+			force: true,
+			recursive: true,
+		});
+	}
 }

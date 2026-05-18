@@ -1,4 +1,6 @@
 {
+  "displayName": "Weather",
+  "description": "Check the forecast",
   "codes": {
     "0": {
       "day": "Sunny",

@@ -10,6 +10,7 @@ export const format = z.enum([
   "md",
   "mdcheck",
   "mdlist",
+  "mdlist2",
   "mdtable",
   "text",
 ]).default("text");

@@ -1,4 +1,6 @@
 {
+  "displayName": "Calendar",
+  "description": "View your upcoming events",
   "fields": {
     "startDate": "Date",
     "startTime": "Time",

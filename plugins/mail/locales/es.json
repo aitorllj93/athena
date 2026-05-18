@@ -1,4 +1,6 @@
 {
+  "displayName": "Correo",
+  "description": "Consulta tu bandeja de correo",
   "unreadCount": "Hay {{total}} mensajes sin leer",
   "fields": {
     "sender": "De",

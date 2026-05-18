@@ -5,6 +5,7 @@ import { renderMdCheckList } from "./checklist";
 import { renderCsv } from "./csv";
 import { renderJson } from "./json";
 import { renderMdList } from "./list";
+import { renderMdListOneline } from "./list-oneline";
 import { renderMdTable } from "./table";
 import { renderText } from "./text";
 
@@ -21,6 +22,7 @@ export const RENDERERS: Record<Format, RenderFn> = {
   md: renderMdTable,
   mdtable: renderMdTable,
   mdlist: renderMdList,
+  mdlist2: renderMdListOneline,
   mdcheck: renderMdCheckList,
   text: renderText,
 };

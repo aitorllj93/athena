@@ -1,4 +1,6 @@
 {
+  "displayName": "Matinales",
+  "description": "Recibe un resumen matutino",
   "brief": "Informe Matutino",
   "agenda": "Agenda",
   "inbox": "Bandeja de Entrada",

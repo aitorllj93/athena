@@ -1,4 +1,6 @@
 {
+  "displayName": "Tareas",
+  "description": "Interactúa con tus tareas de Obsidian a través TaskNotes (mdbase)",
   "unreadCount": "Hay {{total}} tareas pendientes",
   "fields": {
     "block": "Bloque",

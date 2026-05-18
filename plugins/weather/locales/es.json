@@ -1,4 +1,6 @@
 {
+  "displayName": "Clima",
+  "description": "Comprueba el estado del clima",
   "codes": {
     "0": {
       "day": "Soleado",
