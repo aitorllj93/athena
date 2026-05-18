@@ -1,7 +1,7 @@
 import ms from "ms";
 
 import { memo } from "@/lib/cache";
-import { getTranslations } from "@/lib/i18n";
+import { getTranslations, type TFn } from "@/lib/i18n";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import type { PaginationParams } from "@/lib/utils/pagination";
 import type { Format } from "@/lib/utils/render";
@@ -11,12 +11,12 @@ import {
 	listUnreadMails,
 	type MailMessageFields,
 } from "../lib";
+import { INBOX } from "../lib/constants";
 
 const CACHE_TTL = ms("2h");
 const CACHE_KEY = "listUnreadMailsCommand";
 
-// biome-ignore lint/suspicious/noExplicitAny: i18n translation function
-let translator: any = null;
+let translator: TFn|null = null;
 async function getT() {
 	if (translator) return translator;
 	const { t } = await getTranslations("mail");
@@ -25,12 +25,14 @@ async function getT() {
 }
 
 type ListUnreadMailCommandArgs = {
+	box?: string;
 	fields?: MailMessageFields[];
 	format?: Format;
 	pagination?: PaginationParams;
 };
 export const listUnreadMailsCommand = memo(
 	async function listUnreadMailsCommand({
+		box = INBOX,
 		fields = ["received", "sender", "subject", "id"],
 		format = "md",
 		pagination,
@@ -49,7 +51,7 @@ export const listUnreadMailsCommand = memo(
 
 		await mailClient.connect();
 
-		const lock = await mailClient.getMailboxLock("INBOX");
+		const lock = await mailClient.getMailboxLock(box);
 
 		try {
 			const { data, page } = await listUnreadMails(mailClient, {

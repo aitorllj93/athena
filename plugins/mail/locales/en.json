@@ -3,7 +3,11 @@
   "description": "Query your mail inbox",
   "unreadCount": "Found {{total}} unread messages",
   "fields": {
+    "name": "Name",
+    "path": "Path",
+    "body": "Content",
     "sender": "From",
+    "specialUse": "Use",
     "received": "Date",
     "subject": "Subject",
     "id": "ID"

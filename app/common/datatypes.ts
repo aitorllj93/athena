@@ -2,7 +2,7 @@ import z from "zod";
 
 export const fields = z.string().transform((value) =>
   value.split(",").map((item) => item.trim())
-).optional();
+).optional().describe("Fields to display. Comma separated values");
 
 export const format = z.enum([
   "csv",

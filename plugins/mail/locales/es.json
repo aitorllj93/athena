@@ -3,7 +3,11 @@
   "description": "Consulta tu bandeja de correo",
   "unreadCount": "Hay {{total}} mensajes sin leer",
   "fields": {
+    "name": "Nombre",
+    "path": "Ruta",
+    "body": "Contenido",
     "sender": "De",
+    "specialUse": "Uso",
     "received": "Fecha",
     "subject": "Asunto",
     "id": "ID"

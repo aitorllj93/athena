@@ -1,3 +1,4 @@
+import { convert } from "html-to-text";
 import type { DeepKeys } from "@/lib/utils/object";
 
 import { RENDERERS } from "./renderers";
@@ -34,7 +35,7 @@ export function render<TObject = unknown>(
 	let columns = columnDefinitions;
 
 	if (fields) {
-		columns = columns.filter(c => fields.includes(c.key));
+		columns = columns.filter((c) => fields.includes(c.key));
 	}
 
 	columns = sortColumns(columns);
@@ -42,9 +43,8 @@ export function render<TObject = unknown>(
 	return RENDERERS[format](items, columns, opts);
 }
 
-
 function formatGroupMinimal(group: string) {
-	return group
+	return group;
 }
 
 function formatGroupRegular(group: string) {
@@ -59,7 +59,6 @@ export function formatGroup(group: string, format?: Format) {
 	return formatGroupMinimal(group);
 }
 
-
 export function renderGroup<TObject = unknown>(
 	title: string,
 	items: TObject[],
@@ -70,4 +69,8 @@ export function renderGroup<TObject = unknown>(
 	out += render(items, params, opts);
 
 	return out;
+}
+
+export function renderHTML(raw: string) {
+	return convert(raw);
 }
