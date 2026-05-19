@@ -2,6 +2,8 @@ import z from "zod";
 import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
 import { today, tomorrow, yesterday } from "@/lib/utils/date";
+import { completeTaskCommand } from "./commands/complete-task";
+import { createTaskCommand } from "./commands/create-task";
 import { listScheduledTasksCommand } from "./commands/list-scheduled-tasks";
 import type { TaskFields } from "./lib";
 
@@ -25,22 +27,25 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand({
-				date: input.date,
-				fields: input.fields as TaskFields[],
-				format: input.format,
-				groupBy: input.groupBy
-					? {
-							property: input.groupBy,
-							direction: input.groupByDirection,
-						}
-					: undefined,
-				pagination: {
-					limit: input.limit,
+			return listScheduledTasksCommand(
+				{
+					date: input.date,
+					fields: input.fields as TaskFields[],
+					format: input.format,
+					groupBy: input.groupBy
+						? {
+								property: input.groupBy,
+								direction: input.groupByDirection,
+							}
+						: undefined,
+					pagination: {
+						limit: input.limit,
+					},
 				},
-			}, {
-				skipCache: input.skipCache
-			});
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 	today: procedure
 		.meta({
@@ -57,22 +62,25 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand({
-				date: today(),
-				fields: input.fields as TaskFields[],
-				format: input.format,
-				groupBy: input.groupBy
-					? {
-							property: input.groupBy,
-							direction: input.groupByDirection,
-						}
-					: undefined,
-				pagination: {
-					limit: input.limit,
+			return listScheduledTasksCommand(
+				{
+					date: today(),
+					fields: input.fields as TaskFields[],
+					format: input.format,
+					groupBy: input.groupBy
+						? {
+								property: input.groupBy,
+								direction: input.groupByDirection,
+							}
+						: undefined,
+					pagination: {
+						limit: input.limit,
+					},
 				},
-			}, {
-				skipCache: input.skipCache
-			});
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 	tomorrow: procedure
 		.meta({
@@ -89,22 +97,25 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand({
-				date: tomorrow(),
-				fields: input.fields as TaskFields[],
-				format: input.format,
-				groupBy: input.groupBy
-					? {
-							property: input.groupBy,
-							direction: input.groupByDirection,
-						}
-					: undefined,
-				pagination: {
-					limit: input.limit,
+			return listScheduledTasksCommand(
+				{
+					date: tomorrow(),
+					fields: input.fields as TaskFields[],
+					format: input.format,
+					groupBy: input.groupBy
+						? {
+								property: input.groupBy,
+								direction: input.groupByDirection,
+							}
+						: undefined,
+					pagination: {
+						limit: input.limit,
+					},
 				},
-			}, {
-				skipCache: input.skipCache
-			});
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 	yesterday: procedure
 		.meta({
@@ -121,21 +132,52 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand({
-				date: yesterday(),
-				fields: input.fields as TaskFields[],
-				format: input.format,
-				groupBy: input.groupBy
-					? {
-							property: input.groupBy,
-							direction: input.groupByDirection,
-						}
-					: undefined,
-				pagination: {
-					limit: input.limit,
+			return listScheduledTasksCommand(
+				{
+					date: yesterday(),
+					fields: input.fields as TaskFields[],
+					format: input.format,
+					groupBy: input.groupBy
+						? {
+								property: input.groupBy,
+								direction: input.groupByDirection,
+							}
+						: undefined,
+					pagination: {
+						limit: input.limit,
+					},
 				},
-			}, {
-				skipCache: input.skipCache
+				{
+					skipCache: input.skipCache,
+				},
+			);
+		}),
+	complete: procedure
+		.meta({
+			description: "Complete a task by name",
+		})
+		.input(
+			z.tuple([
+				z.string().describe("taskName"),
+			])
+		)
+		.mutation(async ({ input: [taskName] }) => {
+			return completeTaskCommand({
+				name: taskName,
+			});
+		}),
+	create: procedure
+		.meta({
+			description: "Create a task by name",
+		})
+		.input(
+			z.tuple([
+				z.string().describe("taskName"),
+			])
+		)
+		.mutation(async ({ input: [taskName] }) => {
+			return createTaskCommand({
+				name: taskName,
 			});
 		}),
 });
