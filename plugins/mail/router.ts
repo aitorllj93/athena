@@ -1,15 +1,16 @@
 import z from "zod";
 import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
-import { archiveMailCommand } from "./commands/archive-mail";
-import { deleteMailCommand } from "./commands/delete-mail";
-import { listBoxesCommand } from "./commands/list-boxes";
-import { listUnreadMailsCommand } from "./commands/list-unread-mails";
-import { openMailCommand } from "./commands/open-mail";
-import { readMailCommand } from "./commands/read-mail";
-import { spamMailCommand } from "./commands/spam-mail";
+
+import {
+	archiveMailCommand,
+	deleteMailCommand,
+	readMailCommand,
+	spamMailCommand,
+} from "./commands";
 import type { MailBoxFields, MailMessageFields } from "./lib";
 import { INBOX } from "./lib/constants";
+import { listBoxesQuery, listUnreadMailsQuery, openMailQuery } from "./queries";
 
 const mail = router({
 	inbox: procedure
@@ -24,12 +25,15 @@ const mail = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUnreadMailsCommand({
-				fields: input.fields as MailMessageFields[],
-				format: input.format,
-			}, {
-				skipCache: input.skipCache
-			});
+			return listUnreadMailsQuery(
+				{
+					fields: input.fields as MailMessageFields[],
+					format: input.format,
+				},
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 	boxes: router({
 		list: procedure
@@ -46,7 +50,7 @@ const mail = router({
 				}),
 			)
 			.query(async ({ input }) => {
-				return listBoxesCommand({
+				return listBoxesQuery({
 					fields: input.fields as MailBoxFields[],
 					format: input.format,
 					pagination: {
@@ -71,17 +75,20 @@ const mail = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUnreadMailsCommand({
-				box: input.box,
-				fields: input.fields as MailMessageFields[],
-				format: input.format,
-				pagination: {
-					limit: input.limit,
-					page: input.page,
+			return listUnreadMailsQuery(
+				{
+					box: input.box,
+					fields: input.fields as MailMessageFields[],
+					format: input.format,
+					pagination: {
+						limit: input.limit,
+						page: input.page,
+					},
 				},
-			}, {
-				skipCache: input.skipCache
-			});
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 	open: procedure
 		.meta({
@@ -97,7 +104,7 @@ const mail = router({
 			]),
 		)
 		.query(async ({ input: [messageId, opts] }) => {
-			return openMailCommand({
+			return openMailQuery({
 				id: messageId,
 				fields: opts.fields as MailMessageFields[],
 				format: opts.format,

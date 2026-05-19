@@ -170,10 +170,16 @@ const tasks = router({
 		.meta({
 			description: "Complete a task by name",
 		})
-		.input(z.tuple([z.string().describe("taskName")]))
-		.mutation(async ({ input: [taskName] }) => {
+		.input(z.tuple([
+			z.string().describe("taskName")],
+			z.object({
+				archive: z.boolean().default(false),
+			})
+		))
+		.mutation(async ({ input: [taskName, params] }) => {
 			return completeTaskCommand({
 				name: taskName,
+				archive: params?.archive,
 			});
 		}),
 	create: procedure

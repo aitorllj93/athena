@@ -5,10 +5,10 @@ import { getGeolocation } from "@/lib/geolocation";
 import { formatPlaceAddressShort, reverseLocation } from "../lib";
 
 const CACHE_TTL = ms("7d");
-const CACHE_KEY = "getAddressCommand";
+const CACHE_KEY = "getAddressQuery";
 
-export const getAddressCommand = memo(
-	async function getAddressCommand(): Promise<string> {
+export const getAddressQuery = memo(
+	async function getAddressQuery(): Promise<string> {
 		let out = "";
 
 		const { lat, lng } = await getGeolocation();

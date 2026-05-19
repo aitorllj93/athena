@@ -15,10 +15,10 @@ export const format = z.enum([
   "text",
 ]).default("text");
 
-export const limit = z.int();
+export const limit = z.int().min(0).max(999);
 export const page = z.int().default(1);
 
-export const groupBy = z.string();
+export const groupBy = z.string().describe("Field to use for the grouping");
 export const groupByDirection = z.enum([
   "desc",
   "asc"

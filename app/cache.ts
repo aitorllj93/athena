@@ -1,5 +1,5 @@
 import z from "zod";
-import { clean } from "@/lib/cache";
+import { cleanCache } from "@/lib/cache";
 import { procedure, router } from "@/lib/trpc";
 
 export const cacheRouter = router({
@@ -15,6 +15,6 @@ export const cacheRouter = router({
 				.describe("cacheKeys"),
 		)
 		.query(async ({ input }) => {
-			await clean(input);
+			await cleanCache(input);
 		}),
 });

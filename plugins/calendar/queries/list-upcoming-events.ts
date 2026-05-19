@@ -14,21 +14,21 @@ import {
 } from "../lib";
 
 const CACHE_TTL = ms("2h");
-const CACHE_KEY = "listUpcomingEventsCommand";
+const CACHE_KEY = "listUpcomingEventsQuery";
 
-type ListUpcomingEventsCommandArgs = {
+type ListUpcomingEventsQueryArgs = {
 	fields?: CalendarEventFields[];
 	format?: Format;
 	groupBy?: GroupByParams;
 	pagination?: PaginationParams;
 };
-export const listUpcomingEventsCommand = memo(
-	async function listUpcomingEventsCommand({
+export const listUpcomingEventsQuery = memo(
+	async function listUpcomingEventsQuery({
 		fields = ["startDate", "startTime", "summary", "id"],
 		format = "text",
 		groupBy,
 		pagination,
-	}: ListUpcomingEventsCommandArgs = {}): Promise<string> {
+	}: ListUpcomingEventsQueryArgs = {}): Promise<string> {
 		let out = "";
 
 		const auth = getOAuthClient();

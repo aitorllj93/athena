@@ -18,9 +18,7 @@ export function memo<TArgs extends unknown[], TResult>(
 			`WARNING: keyPrefix not found, falling back to \`fn.name\` "${fn.name}" this behavior might fail on compilation builds`,
 		);
 	}
-	return async (
-		...params: [...TArgs, MemoOptions?]
-	): Promise<TResult> => {
+	return async (...params: [...TArgs, MemoOptions?]): Promise<TResult> => {
 		const maybeOptions = params.at(-1);
 
 		const hasOptions =
@@ -28,13 +26,9 @@ export function memo<TArgs extends unknown[], TResult>(
 			maybeOptions !== null &&
 			"skipCache" in maybeOptions;
 
-		const options = hasOptions
-			? (maybeOptions as MemoOptions)
-			: undefined;
+		const options = hasOptions ? (maybeOptions as MemoOptions) : undefined;
 
-		const args = (hasOptions
-			? params.slice(0, -1)
-			: params) as TArgs;
+		const args = (hasOptions ? params.slice(0, -1) : params) as TArgs;
 
 		const key = crypto
 			.createHash("sha1")
@@ -57,20 +51,25 @@ export function memo<TArgs extends unknown[], TResult>(
 		}
 
 		const result = await fn(...args);
-		await cacache.put(CACHE_DIR, key, JSON.stringify(result));
+		await cacache.put(CACHE_DIR, key, JSON.stringify(result), {
+			metadata: { keyPrefix: keyPrefix ?? fn.name },
+		});
 		return result;
 	};
 }
 
-export async function clean(keys?: string[]) {
-	if (keys) {
-		for (const key of keys) {
-			await cacache.rm(CACHE_DIR, key);
-		}
-	} else {
-		await rm(CACHE_DIR, {
-			force: true,
-			recursive: true,
-		});
+export async function cleanCache(keyPrefixes?: string[] | string) {
+	if (!keyPrefixes) {
+		await rm(CACHE_DIR, { force: true, recursive: true });
+		return;
 	}
+
+	const entries = await cacache.ls(CACHE_DIR);
+	const prefixSet = new Set(typeof keyPrefixes === "string" ? [keyPrefixes] : keyPrefixes);
+
+	await Promise.all(
+		Object.values(entries)
+			.filter((entry) => prefixSet.has(entry.metadata?.keyPrefix))
+			.map((entry) => cacache.rm.entry(CACHE_DIR, entry.key)),
+	);
 }

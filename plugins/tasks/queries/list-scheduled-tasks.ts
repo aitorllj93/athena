@@ -17,7 +17,7 @@ import {
 	type TaskFields,
 } from "../lib";
 
-const CACHE_TTL = ms("1s");
+const CACHE_TTL = ms("2h");
 const CACHE_KEY = "listScheduledTasksQuery";
 
 type ListScheduledTasksQueryArgs = {

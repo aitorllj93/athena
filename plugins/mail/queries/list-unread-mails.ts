@@ -1,7 +1,7 @@
 import ms from "ms";
 
 import { memo } from "@/lib/cache";
-import { getTranslations, type TFn } from "@/lib/i18n";
+import { getTranslations } from "@/lib/i18n";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import type { PaginationParams } from "@/lib/utils/pagination";
 import type { Format } from "@/lib/utils/render";
@@ -14,32 +14,24 @@ import {
 import { INBOX } from "../lib/constants";
 
 const CACHE_TTL = ms("2h");
-const CACHE_KEY = "listUnreadMailsCommand";
+const CACHE_KEY = "listUnreadMailsQuery";
 
-let translator: TFn|null = null;
-async function getT() {
-	if (translator) return translator;
-	const { t } = await getTranslations("mail");
-	translator = t;
-	return t;
-}
-
-type ListUnreadMailCommandArgs = {
+type ListUnreadMailQueryArgs = {
 	box?: string;
 	fields?: MailMessageFields[];
 	format?: Format;
 	pagination?: PaginationParams;
 };
-export const listUnreadMailsCommand = memo(
-	async function listUnreadMailsCommand({
+export const listUnreadMailsQuery = memo(
+	async function listUnreadMailsQuery({
 		box = INBOX,
 		fields = ["received", "sender", "subject", "id"],
 		format = "md",
 		pagination,
-	}: ListUnreadMailCommandArgs = {}): Promise<string> {
+	}: ListUnreadMailQueryArgs = {}): Promise<string> {
 		let out = "";
 
-		const t = await getT();
+		const { t } = await getTranslations("mail");
 
 		const accessToken = getAccessToken();
 		const user = getUser();

@@ -1,5 +1,6 @@
 import { procedure, router } from "@/lib/trpc";
-import { getAddressCommand } from "./commands/get-address";
+
+import { getAddressQuery } from "./queries";
 
 const map = router({
 	address: procedure
@@ -7,7 +8,7 @@ const map = router({
 			description: "Display the current coordinates address information",
 		})
 		.query(async () => {
-			return getAddressCommand();
+			return getAddressQuery();
 		}),
 });
 

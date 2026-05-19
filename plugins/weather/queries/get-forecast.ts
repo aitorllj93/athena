@@ -5,10 +5,10 @@ import { getGeolocation } from "@/lib/geolocation";
 import { forecast, formatForecast } from "../lib";
 
 const CACHE_TTL = ms("12h");
-const CACHE_KEY = "getForecastCommand";
+const CACHE_KEY = "getForecastQuery";
 
-export const getForecastCommand = memo(
-	async function getForecastCommand(): Promise<string> {
+export const getForecastQuery = memo(
+	async function getForecastQuery(): Promise<string> {
 		let out = "";
 
 		const geolocation = await getGeolocation();

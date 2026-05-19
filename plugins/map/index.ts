@@ -1,8 +1,8 @@
 import type { Plugin } from "@/lib/plugins/registry";
-import { getAddressCommand } from "./commands/get-address";
 import enLocales from "./locales/en.json" with { type: "json" };
 import esLocales from "./locales/es.json" with { type: "json" };
 import pkg from "./package.json" with { type: "json" };
+import { getAddressQuery } from "./queries";
 import router from "./router";
 
 export default {
@@ -11,10 +11,10 @@ export default {
 	version: pkg.version,
 	router,
 	commands: {
-		getAddress: getAddressCommand,
+		getAddress: getAddressQuery,
 	},
 	locales: {
 		en: enLocales,
-		es: esLocales
-	}
+		es: esLocales,
+	},
 } satisfies Plugin;

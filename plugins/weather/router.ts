@@ -1,5 +1,5 @@
 import { procedure, router } from "@/lib/trpc";
-import { getForecastCommand } from "./commands/get-forecast";
+import { getForecastQuery } from "./queries";
 
 const weather = router({
 	forecast: procedure
@@ -7,7 +7,7 @@ const weather = router({
 			description: "Display the forecast for today"
 		})
 		.query(async () => {
-			return getForecastCommand();
+			return getForecastQuery();
 		}),
 });
 

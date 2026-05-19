@@ -1,8 +1,8 @@
 import z from "zod";
 import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
-import { listUpcomingEventsCommand } from "./commands/list-upcoming-events";
 import type { CalendarEventFields } from "./lib";
+import { listUpcomingEventsQuery } from "./queries";
 
 const calendar = router({
 	agenda: procedure
@@ -17,7 +17,7 @@ const calendar = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUpcomingEventsCommand(
+			return listUpcomingEventsQuery(
 				{
 					fields: (input.fields ?? [
 						"startTime",
@@ -50,7 +50,7 @@ const calendar = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUpcomingEventsCommand(
+			return listUpcomingEventsQuery(
 				{
 					fields: input.fields as CalendarEventFields[],
 					format: input.format,
