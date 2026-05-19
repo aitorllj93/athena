@@ -9,6 +9,9 @@ import { datatypes } from "./common";
 
 export const pluginsRouter = router({
 	list: procedure
+		.meta({
+			description: "List installed and available plugins"
+		})
 		.input(
 			z.object({
 				fields: datatypes.fields,
@@ -30,9 +33,15 @@ export const pluginsRouter = router({
 			}),
 		),
 	add: procedure
+		.meta({
+			description: "Install plugin by name"
+		})
 		.input(z.string().describe("pluginName"))
 		.mutation(async ({ input }) => addPlugin(input)),
 	remove: procedure
+		.meta({
+			description: "Uninstall plugin by name"
+		})
 		.input(z.string().describe("pluginName"))
 		.mutation(async ({ input }) => removePlugin(input)),
 });

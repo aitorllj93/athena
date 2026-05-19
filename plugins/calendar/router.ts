@@ -6,22 +6,38 @@ import type { CalendarEventFields } from "./lib";
 
 const calendar = router({
 	agenda: procedure
+		.meta({
+			description: "Display upcoming events",
+		})
 		.input(
 			z.object({
 				fields: datatypes.fields,
 				format: datatypes.format,
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUpcomingEventsCommand({
-				fields: (input.fields ?? ["startTime", "summary", "id"]) as CalendarEventFields[],
-				format: input.format,
-				groupBy: {
-					"property": "startDate",
-				}
-			});
+			return listUpcomingEventsCommand(
+				{
+					fields: (input.fields ?? [
+						"startTime",
+						"summary",
+						"id",
+					]) as CalendarEventFields[],
+					format: input.format,
+					groupBy: {
+						property: "startDate",
+					},
+				},
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 	upcoming: procedure
+		.meta({
+			description: "Display upcoming events",
+		})
 		.input(
 			z.object({
 				fields: datatypes.fields,
@@ -30,23 +46,29 @@ const calendar = router({
 				groupByDirection: datatypes.groupByDirection,
 				limit: datatypes.limit.default(10),
 				page: datatypes.page,
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUpcomingEventsCommand({
-				fields: input.fields as CalendarEventFields[],
-				format: input.format,
-				groupBy: input.groupBy
-					? {
-							property: input.groupBy,
-							direction: input.groupByDirection,
-						}
-					: undefined,
-				pagination: {
-					limit: input.limit,
-					page: input.page,
+			return listUpcomingEventsCommand(
+				{
+					fields: input.fields as CalendarEventFields[],
+					format: input.format,
+					groupBy: input.groupBy
+						? {
+								property: input.groupBy,
+								direction: input.groupByDirection,
+							}
+						: undefined,
+					pagination: {
+						limit: input.limit,
+						page: input.page,
+					},
 				},
-			});
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 });
 

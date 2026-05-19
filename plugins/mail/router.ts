@@ -20,12 +20,15 @@ const mail = router({
 			z.object({
 				fields: datatypes.fields,
 				format: datatypes.format,
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
 			return listUnreadMailsCommand({
 				fields: input.fields as MailMessageFields[],
 				format: input.format,
+			}, {
+				skipCache: input.skipCache
 			});
 		}),
 	boxes: router({
@@ -64,6 +67,7 @@ const mail = router({
 				box: z.string().default(INBOX),
 				limit: datatypes.limit.default(50),
 				page: datatypes.page,
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
@@ -75,6 +79,8 @@ const mail = router({
 					limit: input.limit,
 					page: input.page,
 				},
+			}, {
+				skipCache: input.skipCache
 			});
 		}),
 	open: procedure

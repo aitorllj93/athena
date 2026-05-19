@@ -7,6 +7,9 @@ import type { TaskFields } from "./lib";
 
 const tasks = router({
 	scheduled: procedure
+		.meta({
+			description: "Display the scheduled tasks",
+		})
 		.input(
 			z.object({
 				date: z
@@ -18,6 +21,7 @@ const tasks = router({
 				groupBy: datatypes.groupBy.optional(),
 				groupByDirection: datatypes.groupByDirection,
 				limit: datatypes.limit.default(10),
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
@@ -34,9 +38,14 @@ const tasks = router({
 				pagination: {
 					limit: input.limit,
 				},
+			}, {
+				skipCache: input.skipCache
 			});
 		}),
 	today: procedure
+		.meta({
+			description: "Display the scheduled tasks for today",
+		})
 		.input(
 			z.object({
 				fields: datatypes.fields,
@@ -44,6 +53,7 @@ const tasks = router({
 				groupBy: datatypes.groupBy.optional(),
 				groupByDirection: datatypes.groupByDirection,
 				limit: datatypes.limit.default(10),
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
@@ -60,9 +70,14 @@ const tasks = router({
 				pagination: {
 					limit: input.limit,
 				},
+			}, {
+				skipCache: input.skipCache
 			});
 		}),
 	tomorrow: procedure
+		.meta({
+			description: "Display the scheduled tasks for tomorrow",
+		})
 		.input(
 			z.object({
 				fields: datatypes.fields,
@@ -70,6 +85,7 @@ const tasks = router({
 				groupBy: datatypes.groupBy.optional(),
 				groupByDirection: datatypes.groupByDirection,
 				limit: datatypes.limit.default(10),
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
@@ -86,9 +102,14 @@ const tasks = router({
 				pagination: {
 					limit: input.limit,
 				},
+			}, {
+				skipCache: input.skipCache
 			});
 		}),
 	yesterday: procedure
+		.meta({
+			description: "Display the scheduled tasks for yesterday",
+		})
 		.input(
 			z.object({
 				fields: datatypes.fields,
@@ -96,6 +117,7 @@ const tasks = router({
 				groupBy: datatypes.groupBy.optional(),
 				groupByDirection: datatypes.groupByDirection,
 				limit: datatypes.limit.default(10),
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
@@ -112,6 +134,8 @@ const tasks = router({
 				pagination: {
 					limit: input.limit,
 				},
+			}, {
+				skipCache: input.skipCache
 			});
 		}),
 });

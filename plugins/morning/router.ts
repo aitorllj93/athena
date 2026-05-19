@@ -5,6 +5,9 @@ import { morningBriefCommand } from "./commands/morning-brief";
 
 const morning = router({
 	brief: procedure
+		.meta({
+			description: "Display a summary of the tasks and agenda for the day",
+		})
 		.input(
 			z.object({
 				fields: datatypes.fields,

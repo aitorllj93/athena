@@ -4,6 +4,9 @@ import { procedure, router } from "@/lib/trpc";
 
 export const cacheRouter = router({
 	clean: procedure
+		.meta({
+			description: "Clean the cache"
+		})
 		.input(
 			z
 				.string()

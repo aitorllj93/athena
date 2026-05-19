@@ -4,6 +4,10 @@ import cacache from "cacache";
 import stringify from "fast-json-stable-stringify";
 import { CACHE_DIR, DEFAULT_CACHE_TTL } from "./constants";
 
+type MemoOptions = {
+	skipCache?: boolean;
+};
+
 export function memo<TArgs extends unknown[], TResult>(
 	fn: (...args: TArgs) => Promise<TResult>,
 	ttlMs = DEFAULT_CACHE_TTL,
@@ -14,11 +18,33 @@ export function memo<TArgs extends unknown[], TResult>(
 			`WARNING: keyPrefix not found, falling back to \`fn.name\` "${fn.name}" this behavior might fail on compilation builds`,
 		);
 	}
-	return async (...args: TArgs): Promise<TResult> => {
+	return async (
+		...params: [...TArgs, MemoOptions?]
+	): Promise<TResult> => {
+		const maybeOptions = params.at(-1);
+
+		const hasOptions =
+			typeof maybeOptions === "object" &&
+			maybeOptions !== null &&
+			"skipCache" in maybeOptions;
+
+		const options = hasOptions
+			? (maybeOptions as MemoOptions)
+			: undefined;
+
+		const args = (hasOptions
+			? params.slice(0, -1)
+			: params) as TArgs;
+
 		const key = crypto
 			.createHash("sha1")
 			.update((keyPrefix ?? fn.name) + stringify(args))
 			.digest("hex");
+
+		if (options?.skipCache) {
+			const result = await fn(...args);
+			return result;
+		}
 
 		try {
 			const entry = await cacache.get.info(CACHE_DIR, key);
