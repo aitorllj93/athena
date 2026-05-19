@@ -1,9 +1,15 @@
+import type { Mdbase } from "@/lib/providers/mdbase";
 import { formatISODate } from "@/lib/utils/date";
 import type { Group, GroupByParams } from "@/lib/utils/group";
 import type { Pagination, PaginationParams } from "@/lib/utils/pagination";
-import { DisposableCollection } from "./collection";
 import { hasStatus, isDue, isScheduled } from "./filters";
-import { type QueryResultGroup, type QueryResultTask, type Task, toTask, toTaskGroup } from "./types";
+import {
+	type QueryResultGroup,
+	type QueryResultTask,
+	type Task,
+	toTask,
+	toTaskGroup,
+} from "./types";
 
 type ListScheduledTasksParams = {
 	groupBy?: GroupByParams;
@@ -11,18 +17,17 @@ type ListScheduledTasksParams = {
 	date: Date;
 };
 export async function listScheduledTasks(
+	db: Mdbase,
 	params: ListScheduledTasksParams,
 ): Promise<{
 	data?: Task[];
-	groups?:  Group<Task>[];
+	groups?: Group<Task>[];
 	page: Pagination;
 }> {
 	const referenceDate = formatISODate(params.date);
 	const page = params.pagination?.page ?? 1;
 	const limit = params.pagination?.limit ?? 10;
 	const offset = (page - 1) * limit;
-
-	await using db = await DisposableCollection.open();
 
 	const query = await db.collection.query({
 		group_by: params.groupBy,
@@ -40,7 +45,9 @@ export async function listScheduledTasks(
 	});
 
 	const data = ((query.results as QueryResultTask[]) ?? [])?.map(toTask);
-	const groups = (query.groups as QueryResultGroup<QueryResultTask>[])?.map(toTaskGroup);
+	const groups = (query.groups as QueryResultGroup<QueryResultTask>[])?.map(
+		toTaskGroup,
+	);
 
 	const total = query.meta?.total_count ?? data.length;
 

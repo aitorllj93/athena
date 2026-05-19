@@ -29,6 +29,7 @@ class PluginRepositoryClass {
 			const plugin = this.getPluginFromPath(pluginDir);
 
 			if (plugin) {
+				plugin.isLocal = true;
 				results.push(plugin);
 			}
 		}

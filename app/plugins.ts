@@ -40,6 +40,9 @@ export const pluginsRouter = router({
 		.mutation(async ({ input }) => addPlugin(input)),
 	remove: procedure
 		.meta({
+			aliases: {
+				command: ["rm"] 
+			},
 			description: "Uninstall plugin by name"
 		})
 		.input(z.string().describe("pluginName"))

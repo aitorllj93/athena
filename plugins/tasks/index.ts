@@ -1,9 +1,10 @@
 import type { Plugin } from "@/lib/plugins/registry";
 
-import { listScheduledTasksCommand } from "./commands/list-scheduled-tasks";
 import enLocales from "./locales/en.json" with { type: "json" };
 import esLocales from "./locales/es.json" with { type: "json" };
 import pkg from "./package.json" with { type: "json" };
+
+import { listScheduledTasksQuery } from "./queries";
 import router from "./router";
 
 export default {
@@ -12,7 +13,7 @@ export default {
 	version: pkg.version,
 	router,
 	commands: {
-		listScheduledTasks: listScheduledTasksCommand,
+		listScheduledTasks: listScheduledTasksQuery,
 	},
 	locales: {
 		es: esLocales,

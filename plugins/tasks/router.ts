@@ -2,12 +2,26 @@ import z from "zod";
 import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
 import { today, tomorrow, yesterday } from "@/lib/utils/date";
-import { completeTaskCommand } from "./commands/complete-task";
-import { createTaskCommand } from "./commands/create-task";
-import { listScheduledTasksCommand } from "./commands/list-scheduled-tasks";
+
+import {
+	archiveTaskCommand,
+	completeTaskCommand,
+	createTaskCommand,
+} from "./commands";
 import type { TaskFields } from "./lib";
+import { listScheduledTasksQuery } from "./queries";
 
 const tasks = router({
+	archive: procedure
+		.meta({
+			description: "Archive a task by name",
+		})
+		.input(z.tuple([z.string().describe("taskName")]))
+		.mutation(async ({ input: [taskName] }) => {
+			return archiveTaskCommand({
+				name: taskName,
+			});
+		}),
 	scheduled: procedure
 		.meta({
 			description: "Display the scheduled tasks",
@@ -27,7 +41,7 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand(
+			return listScheduledTasksQuery(
 				{
 					date: input.date,
 					fields: input.fields as TaskFields[],
@@ -62,7 +76,7 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand(
+			return listScheduledTasksQuery(
 				{
 					date: today(),
 					fields: input.fields as TaskFields[],
@@ -97,7 +111,7 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand(
+			return listScheduledTasksQuery(
 				{
 					date: tomorrow(),
 					fields: input.fields as TaskFields[],
@@ -132,7 +146,7 @@ const tasks = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listScheduledTasksCommand(
+			return listScheduledTasksQuery(
 				{
 					date: yesterday(),
 					fields: input.fields as TaskFields[],
@@ -156,11 +170,7 @@ const tasks = router({
 		.meta({
 			description: "Complete a task by name",
 		})
-		.input(
-			z.tuple([
-				z.string().describe("taskName"),
-			])
-		)
+		.input(z.tuple([z.string().describe("taskName")]))
 		.mutation(async ({ input: [taskName] }) => {
 			return completeTaskCommand({
 				name: taskName,
@@ -170,11 +180,7 @@ const tasks = router({
 		.meta({
 			description: "Create a task by name",
 		})
-		.input(
-			z.tuple([
-				z.string().describe("taskName"),
-			])
-		)
+		.input(z.tuple([z.string().describe("taskName")]))
 		.mutation(async ({ input: [taskName] }) => {
 			return createTaskCommand({
 				name: taskName,

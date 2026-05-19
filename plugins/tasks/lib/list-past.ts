@@ -1,7 +1,7 @@
+import type { Mdbase } from "@/lib/providers/mdbase";
 import { formatISODate } from "@/lib/utils/date";
 import type { GroupByParams } from "@/lib/utils/group";
 import type { Pagination, PaginationParams } from "@/lib/utils/pagination";
-import { DisposableCollection } from "./collection";
 import { hasStatus, isDue, isScheduled } from "./filters";
 import { type QueryResultTask, type Task, toTask } from "./types";
 
@@ -10,7 +10,10 @@ type ListPastTasksParams = {
 	pagination?: PaginationParams;
 	date: Date;
 };
-export async function listPastTasks(params: ListPastTasksParams): Promise<{
+export async function listPastTasks(
+	db: Mdbase,
+	params: ListPastTasksParams,
+): Promise<{
 	data: Task[];
 	page: Pagination;
 }> {
@@ -19,10 +22,8 @@ export async function listPastTasks(params: ListPastTasksParams): Promise<{
 	const limit = params.pagination?.limit ?? 10;
 	const offset = (page - 1) * limit;
 
-	await using db = await DisposableCollection.open();
-
 	const query = await db.collection.query({
-    group_by: params.groupBy,
+		group_by: params.groupBy,
 		types: ["task"],
 		limit,
 		offset,
