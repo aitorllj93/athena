@@ -88,6 +88,15 @@ export const hasContext = (
 	);
 };
 
+export const hasAnyProject = (
+	value: boolean,
+	{ projects }: TaskNotesFieldsMapping,
+): QueryExpression => {
+	return value ?
+		projects.key :
+		negation(projects.key);
+};
+
 export const belongsToProject = (
 	value: string | string[],
 	{ projects }: TaskNotesFieldsMapping,

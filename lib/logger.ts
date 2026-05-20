@@ -6,7 +6,7 @@ import {
 	getLogger,
 } from "@logtape/logtape";
 import { prettyFormatter } from "@logtape/pretty";
-import { LOGS_FILE, WEBHOOK_URL } from "./constants";
+import { LOGS_FILE, WEBHOOK_ACCESS_TOKEN, WEBHOOK_URL } from "./constants";
 
 await configure({
 	sinks: {
@@ -20,9 +20,16 @@ await configure({
 				return;
 			}
 
+			const headers: Record<string, string> = {
+				"Content-Type": "application/json",
+			};
+			if (WEBHOOK_ACCESS_TOKEN) {
+				headers.Authorization = `Bearer ${WEBHOOK_ACCESS_TOKEN}`;
+			}
+
 			await fetch(WEBHOOK_URL, {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers,
 				body: JSON.stringify({
 					timestamp: record.timestamp,
 					level: record.level,
@@ -36,7 +43,11 @@ await configure({
 	loggers: [
 		{ category: ["logtape", "meta"], sinks: ["meta"], lowestLevel: "warning" },
 		{ category: [], sinks: ["file"], lowestLevel: "debug" },
-		{ category: ["events"], sinks: WEBHOOK_URL ? ["webhook", "file"] : ["file"], lowestLevel: "info" },
+		{
+			category: ["events"],
+			sinks: WEBHOOK_URL ? ["webhook", "file"] : ["file"],
+			lowestLevel: "info",
+		},
 	],
 });
 

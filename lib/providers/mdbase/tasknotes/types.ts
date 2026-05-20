@@ -8,9 +8,37 @@ export type TaskNotesTaskStatus =
   | "wont-do"
   | "blocked";
 
+export type TaskNotesTaskReminder = {
+  id: string;
+  type: "absolute" | "relative";
+  description?: string;
+  /**
+   * Field the reminder is relative to (e.g. 'due')
+   */
+  relatedTo?: "due" | "scheduled";
+  /**
+   * ISO 8601 duration offset (e.g. '-PT1H').
+   */
+  offset?: string;
+  absoluteTime?: string;
+}
+
+export type TaskNotesTaskTimeEntry = {
+  startTime?: Date;
+  endTime?: Date;
+  description?: string;
+  duration?: number;
+};
+
+export type TaskNotesTaskBlocker = {
+  uid: string;
+  reltype: string;
+  gap?: string;
+};
+
 export type TaskNotesTask = {
   title?: string;
-  status?: TaskNotesTaskStatus;
+  status?: string;
   priority?: string;
   due?: string;
   scheduled?: string;
@@ -23,31 +51,9 @@ export type TaskNotesTask = {
   recurrence?: string;
   recurrenceAnchor?: "scheduled" | "completion";
   tags?: string[];
-  timeEntries?: {
-    startTime?: Date;
-    endTime?: Date;
-    description?: string;
-    duration?: number;
-  }[];
-  reminders?: {
-    id: string;
-    type: "absolute" | "relative";
-    description?: string;
-    /**
-     * Field the reminder is relative to (e.g. 'due')
-     */
-    relatedTo: "due" | "scheduled";
-    /**
-     * ISO 8601 duration offset (e.g. '-PT1H').
-     */
-    offset?: string;
-    absoluteTime?: Date;
-  };
-  blockedBy?: {
-    uid: string;
-    reltype: string;
-    gap?: string;
-  }[];
+  timeEntries?: TaskNotesTaskTimeEntry[];
+  reminders?: TaskNotesTaskReminder[];
+  blockedBy?: TaskNotesTaskBlocker[];
   completeInstances?: Date[];
   skippedInstances?: Date[];
   icsEventId?: string;

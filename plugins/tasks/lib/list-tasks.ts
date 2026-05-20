@@ -1,25 +1,31 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
 import {
-  buildTaskNotesQuery,
-  getTaskNotesFields,
-  TASKNOTES_TYPES,
-  type TaskNotesFieldFilters,
+	buildTaskNotesQuery,
+	getTaskNotesFields,
+	TASKNOTES_TYPES,
+	type TaskNotesFieldFilters,
 } from "@/lib/providers/mdbase/tasknotes";
 import type { Group, GroupByParams } from "@/lib/utils/group";
 import type { Pagination, PaginationParams } from "@/lib/utils/pagination";
 import {
-  type QueryResult,
-  type QueryResultGroup,
-  type Task,
-  toTask,
-  toTaskGroup,
+	type QueryResult,
+	type QueryResultGroup,
+	type Task,
+	toTask,
+	toTaskGroup,
 } from "./types";
 
 const DEFAULT_LIMIT = 50;
 
+type OrderByParams = {
+	field: string;
+	direction: "desc" | "asc";
+};
+
 type ListTasksParams = {
 	filters?: TaskNotesFieldFilters;
 	groupBy?: GroupByParams;
+	orderBy?: OrderByParams | OrderByParams[];
 	pagination?: PaginationParams;
 };
 export async function listTasks(
@@ -29,6 +35,7 @@ export async function listTasks(
 			isActive: true,
 		},
 		groupBy,
+		orderBy,
 		pagination,
 	}: ListTasksParams = {},
 ): Promise<{
@@ -48,14 +55,17 @@ export async function listTasks(
 		filters,
 	});
 
-  console.log(where);
-
 	const query = await db.collection.query({
 		group_by: groupBy,
 		types: [TASKNOTES_TYPES.TASK],
 		limit,
 		offset,
 		where,
+		order_by: orderBy
+			? Array.isArray(orderBy)
+				? orderBy
+				: [orderBy]
+			: undefined,
 	});
 
 	const data = ((query.results as QueryResult[]) ?? [])?.map(toTask);

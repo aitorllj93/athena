@@ -1,12 +1,12 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
-import { TASK } from "./constants";
+import { TASKNOTES_TYPES } from "@/lib/providers/mdbase/tasknotes";
 import { lookupTask } from "./lookup-task";
 
 type CompleteTaskParams = {
 	name: string;
 };
 export async function archiveTask(db: Mdbase, { name }: CompleteTaskParams) {
-	const typeDef = await db.getType(TASK);
+	const typeDef = await db.getType(TASKNOTES_TYPES.TASK);
 	const path = db.resolvePath(typeDef, name);
 	const archivePath = db.resolveArchivePath(typeDef, name);
 	if (!archivePath) {
@@ -23,11 +23,8 @@ export async function archiveTask(db: Mdbase, { name }: CompleteTaskParams) {
 	await db.collection.update({
 		path: task.path,
 		fields: {
-			tags: [
-				...task.tags ?? [],
-				"archive"
-			]
-		}
+			tags: [...(task.tags ?? []), "archive"],
+		},
 	});
 
 	await db.collection.rename({

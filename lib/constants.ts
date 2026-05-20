@@ -4,6 +4,7 @@ import { join } from "node:path";
 import ms from "ms";
 
 export const WEBHOOK_URL = process.env.WEBHOOK_URL;
+export const WEBHOOK_ACCESS_TOKEN = process.env.WEBHOOK_ACCESS_TOKEN;
 export const CONFIG_DIRECTORY = join(homedir(), ".athena");
 export const LOGS_DIRECTORY = join(CONFIG_DIRECTORY, "logs");
 export const CACHE_DIR = join(CONFIG_DIRECTORY, "cache");

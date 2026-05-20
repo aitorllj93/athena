@@ -1,8 +1,7 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
 import { generateProjectId } from "./generate-project-id";
 import { getProject } from "./get-project";
-import { listProjectTasks } from "./list-project-tasks";
-import type { Task } from "./types";
+import { listTasks } from "./list-tasks";
 
 const DEFAULT_PREFIX = "TSK";
 
@@ -15,19 +14,22 @@ export async function generateTaskId(
 ): Promise<string> {
 	let prefix = DEFAULT_PREFIX;
 	let maxId = 0;
-	let previousTasks: Task[] | undefined;
+
+	const { data: previousTasks } = await listTasks(db, {
+		filters: projectName
+			? { projects: [projectName] }
+			: { hasAnyProject: false },
+		orderBy: {
+			field: "dateCreated",
+			direction: "desc",
+		},
+	});
 
 	if (projectName) {
 		const project = await getProject(db, {
 			projectName,
 		}).catch(() => null);
 		prefix = project?.id ?? generateProjectId(projectName);
-
-		const { data } = await listProjectTasks(db, { projectName });
-		previousTasks = data;
-	} else {
-		throw new Error("Method not implemented");
-		// Find prefixed by DEFAULT_PREFIX
 	}
 
 	if (previousTasks) {

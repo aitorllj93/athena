@@ -8,6 +8,7 @@ import { TASKNOTES_STATUS } from "../constants";
 import type { TaskNotesFieldsMapping } from "../types";
 import {
 	belongsToProject,
+	hasAnyProject,
 	hasContext,
 	hasNoStatus,
 	hasStatus,
@@ -35,6 +36,7 @@ export type TaskNotesFieldFilters = TaskNotesBaseFieldFilters & {
 	isDated?: string;
 	/** Checks whether this task is scheduled or due before date */
 	isPast?: string;
+	hasAnyProject?: boolean;
 	/** Include additional custom expressions */
 	expressions?: QueryExpression | QueryExpression[];
 };
@@ -80,6 +82,13 @@ const builders = new Map<
 				return v;
 			},
 		},
+	],
+	[
+		"hasAnyProject",
+		{
+			key: "hasAnyProject",
+			build: hasAnyProject,
+		}
 	],
 	[
 		"isActive",

@@ -1,6 +1,5 @@
-import { formatISODate } from "@/lib/utils/date";
 import type { TypeDefinition } from "../types";
-import type { TaskNotesFieldRole, TaskNotesTask } from "./types";
+import type { TaskNotesTask } from "./types";
 import { getTaskNotesFields } from "./utils";
 
 export function buildTask(typeDef: TypeDefinition, data: TaskNotesTask) {
@@ -19,10 +18,7 @@ export function buildTask(typeDef: TypeDefinition, data: TaskNotesTask) {
 		}
 	}
 
-	const tasknotesFields = getTaskNotesFields(
-		typeDef,
-		Object.keys(data) as TaskNotesFieldRole[],
-	);
+	const tasknotesFields = getTaskNotesFields(typeDef);
 
 	task[tasknotesFields.dateCreated.key] = data.dateCreated ?? now;
 	task[tasknotesFields.dateModified.key] = data.dateModified ?? now;
@@ -40,11 +36,11 @@ export function buildTask(typeDef: TypeDefinition, data: TaskNotesTask) {
 	}
 
 	if (data.due) {
-		task[tasknotesFields.due.key] = formatISODate(data.due);
+		task[tasknotesFields.due.key] = data.due;
 	}
 
 	if (data.scheduled) {
-		task[tasknotesFields.scheduled.key] = formatISODate(data.scheduled);
+		task[tasknotesFields.scheduled.key] = data.scheduled;
 	}
 
 	if (data.contexts) {
@@ -52,7 +48,7 @@ export function buildTask(typeDef: TypeDefinition, data: TaskNotesTask) {
 	}
 
 	if (data.projects) {
-		task[tasknotesFields.projects.key] = data.projects.map((p) => `[[${p}}}`);
+		task[tasknotesFields.projects.key] = data.projects.map((p) => `[[${p}]]`);
 	}
 
 	if (data.timeEstimate) {

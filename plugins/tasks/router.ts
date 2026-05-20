@@ -282,6 +282,10 @@ const tasks = router({
 					timeEstimate: "e",
 				},
 			},
+			examples: [
+				'create "Pay rent tomorrow 9am #finance @home +admin every month"',
+				'create "Pagar el alquiler mañana 9am #finanzas @casa +admin todos los meses"'
+			]
 		})
 		.input(
 			z.tuple([

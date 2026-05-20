@@ -6,7 +6,7 @@ import { findProjectRoot } from "@/lib/utils/workspace";
 
 export async function addPlugin(pluginName: string) {
 	const { t } = await getTranslations("common", {
-		keyPrefix: "plugins"
+		keyPrefix: "plugins",
 	});
 	const rootDir = findProjectRoot();
 	const localPluginPath = join(rootDir, "plugins", pluginName);
@@ -36,7 +36,7 @@ export async function addPlugin(pluginName: string) {
 				stdio: "inherit",
 			});
 			return t("installed", {
-				pluginName
+				pluginName,
 			});
 		} catch (error) {
 			throw new Error(
@@ -44,9 +44,11 @@ export async function addPlugin(pluginName: string) {
 			);
 		}
 	} else {
-		console.log(t("installingDynamic", {
-			depName: depName
-		}));
+		console.log(
+			t("installingDynamic", {
+				depName: depName,
+			}),
+		);
 		try {
 			// External npm plugin install
 			execSync(`bun add ${depName}`, {
@@ -54,7 +56,7 @@ export async function addPlugin(pluginName: string) {
 				stdio: "inherit",
 			});
 			return t("installed", {
-				pluginName
+				pluginName,
 			});
 		} catch (error) {
 			throw new Error(
