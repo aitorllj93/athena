@@ -162,3 +162,33 @@ export function formatMinutes(minutes?: number) {
   if (m === 0) return fmt(h, 'hour');
   return `${fmt(h, 'hour')} ${fmt(m, 'minute')}`;
 }
+
+export function msToIsoDuration(ms: number): string {
+  const sign = ms < 0 ? '-' : '';
+  let remaining = Math.abs(ms);
+
+  const hours = Math.floor(remaining / 3_600_000);
+  remaining %= 3_600_000;
+
+  const minutes = Math.floor(remaining / 60_000);
+  remaining %= 60_000;
+
+  const seconds = remaining / 1_000;
+
+  let duration = 'PT';
+
+  if (hours) duration += `${hours}H`;
+  if (minutes) duration += `${minutes}M`;
+
+  // soporta segundos decimales
+  if (seconds) {
+    duration += `${Number(seconds.toFixed(3))}S`;
+  }
+
+  // ISO 8601 requiere al menos una unidad
+  if (duration === 'PT') {
+    duration += '0S';
+  }
+
+  return sign + duration;
+}

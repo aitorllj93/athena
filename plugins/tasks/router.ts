@@ -3,7 +3,7 @@ import z from "zod";
 import { datatypes } from "@/app/common";
 import { commaSeparatedValues } from "@/app/common/datatypes";
 import { procedure, router } from "@/lib/trpc";
-import { today, tomorrow, yesterday } from "@/lib/utils/date";
+import { msToIsoDuration, today, tomorrow, yesterday } from "@/lib/utils/date";
 import {
 	archiveTaskCommand,
 	completeTaskCommand,
@@ -12,6 +12,14 @@ import {
 } from "./commands";
 import type { TaskFields } from "./lib";
 import { listScheduledTasksQuery } from "./queries";
+
+const offset = z
+	.union([z.string(), z.number()])
+	.transform(v => 
+		msToIsoDuration(typeof v === "number" ? v * 1000 : ms(v as ms.StringValue))
+	);
+
+z.iso.duration()
 
 const priority = z
 	.enum(["minimum", "low", "none", "medium", "high", "maximum"])
@@ -44,6 +52,9 @@ const tasks = router({
 	archive: procedure
 		.meta({
 			description: "Archive a task and mark it as won't do",
+			examples: [
+				"archive PKM-1",
+			],
 		})
 		.input(z.tuple([z.string().describe("taskNameOrId")]))
 		.mutation(async ({ input: [name] }) => {
@@ -201,6 +212,9 @@ const tasks = router({
 	complete: procedure
 		.meta({
 			description: "Complete a task",
+			examples: [
+				"complete PKM-1",
+			],
 		})
 		.input(
 			z.tuple(
@@ -295,6 +309,10 @@ const tasks = router({
 	estimate: procedure
 		.meta({
 			description: "Estimate a task",
+			examples: [
+				"estimate PKM-1 3h",
+				"estimate PKM-2 20m",
+			],
 		})
 		.input(
 			z.tuple([
@@ -311,11 +329,15 @@ const tasks = router({
 	block: procedure
 		.meta({
 			description: "Set a task blocker",
+			examples: [
+				"block PKM-1 PKM-2",
+				"block PKM-1 PKM-2,PKM-3",
+			],
 		})
 		.input(
 			z.tuple([
 				z.string().describe("taskNameOrId"),
-				z.string().describe("blockerNameOrId"),
+				commaSeparatedValues.describe("blockerNameOrId"),
 				z.object({
 					reltype: z.string().optional(),
 					gap: z.string().optional(),
@@ -329,19 +351,20 @@ const tasks = router({
 	remind: procedure
 		.meta({
 			description: "Set a task reminder",
+			examples: [
+				"remind PKM-1 --when scheduled --before 30m",
+				'remind PKM-2 --at "12:30"'
+			],
 		})
 		.input(
 			z.tuple([
 				z.string().describe("taskNameOrId"),
 				z.string().describe("description").optional(),
 				z.object({
-					type: z.enum(["absolute", "relative"]).optional(),
-					relatedTo: z.enum(["due", "scheduled"]).optional(),
-					/**
-					 * Replace this with "ms to ISO8601"
-					 */
-					offset: z.iso.duration().optional(),
-					absoluteTime: z.iso.datetime().optional(),
+					when: z.enum(["due", "scheduled"]).optional(),
+					after: offset.optional(),
+					before: offset.optional(),
+					at: z.iso.datetime().optional(),
 				})
 			]),
 		)
@@ -352,11 +375,14 @@ const tasks = router({
 	schedule: procedure
 		.meta({
 			description: "Schedule a task",
+			examples: [
+				"schedule PKM-1 2026-12-31"
+			],
 		})
 		.input(
 			z.tuple([
 				z.string().describe("taskNameOrId"),
-				z.iso.date().describe("scheduled"),
+				z.iso.date().describe("at"),
 			]),
 		)
 		.mutation(async ({ input: [name, scheduled] }) => {
@@ -369,6 +395,10 @@ const tasks = router({
 		context: procedure
 			.meta({
 				description: "Set Context for a task",
+				examples: [
+					"set context PKM-1 management",
+					"set context PKM-2 creativity,home"
+				],
 			})
 			.input(
 				z.tuple([
@@ -385,6 +415,10 @@ const tasks = router({
 		priority: procedure
 			.meta({
 				description: "Set Priority for a task",
+				examples: [
+					"set priority PKM-1 low",
+					"set priority PKM-2 high"
+				],
 			})
 			.input(
 				z.tuple([
@@ -401,6 +435,10 @@ const tasks = router({
 		project: procedure
 			.meta({
 				description: "Set Project for a task",
+				examples: [
+					"set project PKM-1 BBL",
+					"set project PKM-2 PKM,BBL"
+				],
 			})
 			.input(
 				z.tuple([
@@ -417,6 +455,9 @@ const tasks = router({
 		due: procedure
 			.meta({
 				description: "Set Due for a task",
+				examples: [
+					"set due PKM-1 2026-12-31"
+				],
 			})
 			.input(
 				z.tuple([

@@ -6,6 +6,8 @@ import { loadPlugins } from "@/lib/plugins/loader";
 import { auth } from "@/lib/providers/google/auth";
 import { createAppRouter } from "./app";
 
+import pkg from "./package.json" with { type: "json" };
+
 // 1. Initialize authentication credentials
 await auth();
 
@@ -13,8 +15,13 @@ await auth();
 await loadPlugins();
 
 // 3. Compile the tRPC router from registered plugins
-const app = createAppRouter();
+const router = createAppRouter();
 
 // 4. Run the CLI
-const cli = createCli({ router: app });
+const cli = createCli({ 
+  router,
+  name: Object.keys(pkg.bin)[0],
+  version: pkg.version,
+  description: pkg.description,
+});
 cli.run();
