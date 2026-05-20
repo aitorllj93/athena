@@ -1,8 +1,8 @@
 import { cleanCache } from "@/lib/cache";
 import { Mdbase } from "@/lib/providers/mdbase";
-import { createTask, MDBASE_COLLECTION_ROOT } from "../lib";
+import { MDBASE_COLLECTION_ROOT, updateTask } from "../lib";
 
-type CreateTaskCommandArgs = {
+type UpdateTaskCommandArgs = {
 	name: string;
 	title?: string;
 	priority?: string;
@@ -12,12 +12,14 @@ type CreateTaskCommandArgs = {
 	projects?: string[];
 	timeEstimate?: number;
 };
-export async function createTaskCommand(args: CreateTaskCommandArgs): Promise<string> {
+export async function updateTaskCommand(
+	args: UpdateTaskCommandArgs,
+): Promise<string> {
 	const out = "";
 
 	await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
 
-	await createTask(db, args);
+	await updateTask(db, args);
 
 	await cleanCache(["listScheduledTasksQuery"]);
 

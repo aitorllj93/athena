@@ -1,9 +1,13 @@
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { getTranslations } from "@/lib/i18n";
 import { findProjectRoot } from "@/lib/utils/workspace";
 
-export function addPlugin(pluginName: string) {
+export async function addPlugin(pluginName: string) {
+	const { t } = await getTranslations("common", {
+		keyPrefix: "plugins"
+	});
 	const rootDir = findProjectRoot();
 	const localPluginPath = join(rootDir, "plugins", pluginName);
 	const isLocal = existsSync(localPluginPath);
@@ -14,7 +18,11 @@ export function addPlugin(pluginName: string) {
 	const depName = `athena-plugin-${pluginName}`;
 
 	if (isLocal) {
-		console.log(`Installing local plugin: ${pluginName} (workspace:*)...`);
+		console.log(
+			t("installingLocal", {
+				pluginName,
+			}),
+		);
 
 		// 1. Declaratively add the workspace reference to package.json
 		pkg.dependencies = pkg.dependencies || {};
@@ -27,24 +35,30 @@ export function addPlugin(pluginName: string) {
 				cwd: rootDir,
 				stdio: "inherit",
 			});
-			return `Plugin "${pluginName}" successfully installed!`;
+			return t("installed", {
+				pluginName
+			});
 		} catch (error) {
 			throw new Error(
-				`Failed to link workspace plugin: ${(error as Error).message}`,
+				t("failedInstalligLocal", { reason: (error as Error).message }),
 			);
 		}
 	} else {
-		console.log(`Installing dynamic plugin: ${depName}...`);
+		console.log(t("installingDynamic", {
+			depName: depName
+		}));
 		try {
 			// External npm plugin install
 			execSync(`bun add ${depName}`, {
 				cwd: rootDir,
 				stdio: "inherit",
 			});
-			return `Plugin "${pluginName}" successfully installed!`;
+			return t("installed", {
+				pluginName
+			});
 		} catch (error) {
 			throw new Error(
-				`Failed to install dynamic plugin: ${(error as Error).message}`,
+				t("failedInstallingDynamic", { reason: (error as Error).message }),
 			);
 		}
 	}

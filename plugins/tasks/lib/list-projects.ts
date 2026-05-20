@@ -1,53 +1,43 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
-import { formatISODate } from "@/lib/utils/date";
 import type { Group, GroupByParams } from "@/lib/utils/group";
 import type { Pagination, PaginationParams } from "@/lib/utils/pagination";
-import { hasStatus, isDue, isScheduled } from "./filters";
+
 import {
-	type QueryResult,
-	type QueryResultGroup,
-	type Task,
-	toTask,
-	toTaskGroup,
+  type Project,
+  type QueryResult,
+  type QueryResultGroup,
+  toProject,
+  toProjectGroup
 } from "./types";
 
-type ListScheduledTasksParams = {
+const DEFAULT_LIMIT = 50;
+
+type ListProjectsParams = {
 	groupBy?: GroupByParams;
 	pagination?: PaginationParams;
-	date: Date;
 };
-export async function listScheduledTasks(
+export async function listProjects(
 	db: Mdbase,
-	params: ListScheduledTasksParams,
+	params: ListProjectsParams = {},
 ): Promise<{
-	data?: Task[];
-	groups?: Group<Task>[];
+	data?: Project[];
+	groups?: Group<Project>[];
 	page: Pagination;
 }> {
-	const referenceDate = formatISODate(params.date);
 	const page = params.pagination?.page ?? 1;
-	const limit = params.pagination?.limit ?? 10;
+	const limit = params.pagination?.limit ?? DEFAULT_LIMIT;
 	const offset = (page - 1) * limit;
 
 	const query = await db.collection.query({
 		group_by: params.groupBy,
-		types: ["task"],
+		types: ["project"],
 		limit,
 		offset,
-		where: {
-			and: [
-				hasStatus("open"),
-				{
-					or: [isScheduled(referenceDate), isDue(referenceDate)],
-				},
-			],
-		},
+		where: {},
 	});
 
-	const data = ((query.results as QueryResult[]) ?? [])?.map(toTask);
-	const groups = (query.groups as QueryResultGroup[])?.map(
-		toTaskGroup,
-	);
+	const data = ((query.results as QueryResult[]) ?? [])?.map(toProject);
+	const groups = (query.groups as QueryResultGroup[])?.map(toProjectGroup);
 
 	const total = query.meta?.total_count ?? data.length;
 

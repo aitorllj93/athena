@@ -1,9 +1,14 @@
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { getTranslations } from "@/lib/i18n";
 import { findProjectRoot } from "@/lib/utils/workspace";
 
-export function removePlugin(pluginName: string) {
+export async function removePlugin(pluginName: string) {
+	const { t } = await getTranslations("common", {
+		keyPrefix: "plugins"
+	});
+
 	const rootDir = findProjectRoot();
 	const packageJsonPath = join(rootDir, "package.json");
 	const pkg = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
@@ -13,10 +18,18 @@ export function removePlugin(pluginName: string) {
 		pkg.dependencies?.[depName] || pkg.devDependencies?.[depName];
 
 	if (!isInstalled) {
-		return `Plugin "${pluginName}" is not installed.`;
+		return t("pluginIsNotInstalled", {
+			pluginName
+		})
 	}
 
-	console.log(`Removing plugin: ${pluginName} (${depName})...`);
+	console.log(t(
+		"removingPlugin",
+		{
+			pluginName,
+			depName
+		}
+	));
 
 	// 1. Declaratively remove the dependency from package.json
 	if (pkg.dependencies?.[depName]) {
@@ -34,8 +47,12 @@ export function removePlugin(pluginName: string) {
 			cwd: rootDir,
 			stdio: "inherit",
 		});
-		return `Plugin "${pluginName}" successfully removed!`;
+		return t("pluginRemoved", {
+			pluginName
+		})
 	} catch (error) {
-		throw new Error(`Failed to remove plugin: ${(error as Error).message}`);
+		throw new Error(t("failedRemoving", {
+			reason: (error as Error).message
+		}));
 	}
 }

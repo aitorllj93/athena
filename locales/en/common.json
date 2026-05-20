@@ -1,5 +1,14 @@
 {
   "plugins": {
+    "installingLocal": "Installing local plugin: {{pluginName}} (workspace:*)...",
+    "installingDynamic": "Installing dynamic plugin: {{depName}}...",
+    "installed": "Plugin \"{{pluginName}}\" successfully installed!",
+    "failedInstalligLocal": "Failed to link workspace plugin: {{reason}}",
+    "failedInstallingDynamic": "Failed to install dynamic plugin: {{reason}}",
+    "pluginIsNotInstalled": "Plugin {{pluginName}} is not installed.",
+    "removingPlugin": "Removing plugin: {{pluginName}} ({{pluginName}})...",
+    "pluginRemoved": "Plugin \"{{pluginName}}\" successfully removed!",
+    "failedRemoving": "Failed to remove plugin: {{reason}}",
     "fields": {
       "installed": "Installed",
       "available": "Available",

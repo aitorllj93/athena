@@ -1,8 +1,10 @@
 import z from "zod";
 
-export const fields = z.string().transform((value) =>
+export const commaSeparatedValues = z.string().transform((value) =>
   value.split(",").map((item) => item.trim())
-).optional().describe("Fields to display. Comma separated values");
+);
+
+export const fields = commaSeparatedValues.optional().describe("Fields to display. Comma separated values");
 
 export const format = z.enum([
   "csv",
@@ -25,6 +27,7 @@ export const groupByDirection = z.enum([
 ]).optional().default("desc")
 
 export default {
+  commaSeparatedValues,
   fields,
   format,
   groupBy,
