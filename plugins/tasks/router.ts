@@ -11,7 +11,7 @@ import {
 	updateTaskCommand,
 } from "./commands";
 import type { TaskFields } from "./lib";
-import { listScheduledTasksQuery } from "./queries";
+import { listProjectTasksQuery, listScheduledTasksQuery } from "./queries";
 
 const offset = z
 	.union([z.string(), z.number()])
@@ -63,6 +63,44 @@ const tasks = router({
 			});
 		}),
 	list: router({
+		project: procedure
+			.meta({
+				description: "Display the tasks from a project",
+			})
+			.input(
+				z.tuple([
+					z.string().describe("projectNameOrId"),
+					z.object({
+						fields: datatypes.fields,
+						format: datatypes.format,
+						groupBy: datatypes.groupBy.optional(),
+						groupByDirection: datatypes.groupByDirection,
+						limit: datatypes.limit.default(10),
+						skipCache: z.boolean().optional(),
+					}),
+				])
+			)
+			.query(async ({ input: [projectName, params] }) => {
+				return listProjectTasksQuery(
+					{
+						projectName,
+						fields: params.fields as TaskFields[],
+						format: params.format,
+						groupBy: params.groupBy
+							? {
+									property: params.groupBy,
+									direction: params.groupByDirection,
+								}
+							: undefined,
+						pagination: {
+							limit: params.limit,
+						},
+					},
+					{
+						skipCache: params.skipCache,
+					},
+				);
+			}),
 		scheduled: procedure
 			.meta({
 				description: "Display the scheduled tasks",

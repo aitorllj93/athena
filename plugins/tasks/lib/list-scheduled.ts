@@ -1,65 +1,52 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
+import { union } from "@/lib/providers/mdbase/queries";
+import {
+	getTaskNotesFields,
+	isDue,
+	isScheduled,
+	TASKNOTES_TYPES,
+} from "@/lib/providers/mdbase/tasknotes";
+import { TASKNOTES_STATUS } from "@/lib/providers/mdbase/tasknotes/constants";
 import { formatISODate } from "@/lib/utils/date";
 import type { Group, GroupByParams } from "@/lib/utils/group";
 import type { Pagination, PaginationParams } from "@/lib/utils/pagination";
-import { hasStatus, isDue, isScheduled } from "./filters";
-import {
-	type QueryResult,
-	type QueryResultGroup,
-	type Task,
-	toTask,
-	toTaskGroup,
-} from "./types";
+import { listTasks } from "./list-tasks";
+import type { Task } from "./types";
+
+type TaskFilters = {
+	project?: string;
+};
 
 type ListScheduledTasksParams = {
+	filters?: TaskFilters;
 	groupBy?: GroupByParams;
 	pagination?: PaginationParams;
 	date: Date;
 };
 export async function listScheduledTasks(
 	db: Mdbase,
-	params: ListScheduledTasksParams,
+	{ date, filters, groupBy, pagination }: ListScheduledTasksParams,
 ): Promise<{
 	data?: Task[];
 	groups?: Group<Task>[];
 	page: Pagination;
 }> {
-	const referenceDate = formatISODate(params.date);
-	const page = params.pagination?.page ?? 1;
-	const limit = params.pagination?.limit ?? 10;
-	const offset = (page - 1) * limit;
+	const referenceDate = formatISODate(date);
+	const typeDef = await db.getType(TASKNOTES_TYPES.TASK);
+	const fields = getTaskNotesFields(typeDef);
 
-	const query = await db.collection.query({
-		group_by: params.groupBy,
-		types: ["task"],
-		limit,
-		offset,
-		where: {
-			and: [
-				hasStatus("open"),
-				{
-					or: [isScheduled(referenceDate), isDue(referenceDate)],
-				},
+	return listTasks(db, {
+		filters: {
+			status: TASKNOTES_STATUS.OPEN,
+			expressions: [
+				union([
+					isScheduled(referenceDate, fields),
+					isDue(referenceDate, fields),
+				]),
 			],
+			...filters,
 		},
+		groupBy,
+		pagination,
 	});
-
-	const data = ((query.results as QueryResult[]) ?? [])?.map(toTask);
-	const groups = (query.groups as QueryResultGroup[])?.map(
-		toTaskGroup,
-	);
-
-	const total = query.meta?.total_count ?? data.length;
-
-	return {
-		data,
-		groups,
-		page: {
-			page,
-			limit,
-			total,
-			totalPages: Math.ceil(total / limit),
-			hasMore: query.meta?.has_more ?? offset + limit < total,
-		},
-	};
 }

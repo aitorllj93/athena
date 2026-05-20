@@ -1,7 +1,6 @@
-
 import type { Mdbase } from "@/lib/providers/mdbase";
 import { TASK } from "./constants";
-import { type QueryResult, toTask } from "./types";
+import { lookupTask } from "./lookup-task";
 
 type CompleteTaskParams = {
 	name: string;
@@ -14,16 +13,22 @@ export async function archiveTask(db: Mdbase, { name }: CompleteTaskParams) {
 		return;
 	}
 
-	const existing = await db.collection.query({
-		types: ["task"],
-		where: `file.path == "${path}"`,
-	});
+	const task = await lookupTask(db, { taskNameOrId: name });
 
-	if (!existing.results || existing.results.length === 0) {
-		throw new Error(`Task not found`);
+	if (task.tags?.includes("archive")) {
+		console.log(`Task "${name}" is already archived.`);
+		return;
 	}
 
-	const task = toTask(existing.results[0] as QueryResult);
+	await db.collection.update({
+		path: task.path,
+		fields: {
+			tags: [
+				...task.tags ?? [],
+				"archive"
+			]
+		}
+	});
 
 	await db.collection.rename({
 		from: path,

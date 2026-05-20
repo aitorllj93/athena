@@ -1,10 +1,9 @@
 import { loadConfig } from "@callumalpass/mdbase";
-import { TaskNotes } from "./tasknotes";
+
 import type { Collection, Config, TypeDefinition } from "./types";
 import { getType, openCollection } from "./utils";
 
 export class Mdbase {
-	public taskNotes = new TaskNotes();
 
 	private constructor(
 		public readonly root: string,

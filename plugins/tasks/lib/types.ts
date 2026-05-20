@@ -42,6 +42,7 @@ export type TaskType = {
 	contexts?: string[];
 	block?: string;
 	recurrence_anchor?: string;
+	tags?: string[];
 };
 
 export type Task = {
@@ -61,6 +62,7 @@ export type Task = {
 	 * @deprecated use contexts instead
 	 */
 	block?: string;
+	tags?: string[];
 };
 
 export type ProjectType = {
@@ -82,11 +84,12 @@ export type Project = {
 
 export type TaskFields = DeepKeys<Task>;
 
-export function toTask(task: QueryResult<TaskType>): Task {
+export function toTask(task: QueryResult<TaskType> | ReadResult<TaskType>): Task {
+	const path = 'path' in task ? task.path : task.file.path;
 	return {
 		id: task.id,
-		path: task.path,
-		name: basename(task.path, extname(task.path)),
+		path,
+		name: basename(path, extname(path)),
 		status: task.status ?? "open",
 		projects: task.projects,
 		priority: task.priority,
@@ -94,6 +97,7 @@ export function toTask(task: QueryResult<TaskType>): Task {
 		blockedBy: task.blockedBy,
 		block: task.block,
 		contexts: task.contexts,
+		tags: task.tags,
 	};
 }
 

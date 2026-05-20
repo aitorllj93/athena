@@ -9,62 +9,105 @@ export type Config = MdbaseConfig;
 
 export type Collection = MdbaseCollection;
 
-export type TaskNotesTaskStatus = "open" | "in-progress" | "done" | "wont-do" | "blocked";
+export type BaseFieldDefinition = MdbaseFieldDefinition & {
+	type:
+		| "string"
+		| "enum"
+		| "date"
+		| "list"
+		| "object"
+		| "link"
+		| "integer"
+		| "datetime";
+	description?: string;
+	tn_role?: string;
+};
 
-export type TaskNotesTask = {
-	title?: string;
-	status?: TaskNotesTaskStatus;
-	priority?: string;
-	due?: string;
-	scheduled?: string;
-	contexts?: string[];
-	projects?: string[];
-	timeEstimate?: number;
-	completedDate?: Date;
-	dateCreated?: Date;
-	dateModified?: Date;
-	recurrence?: string;
-	recurrenceAnchor?: "scheduled" | "completion";
-	tags?: string[];
-	timeEntries?: {
-		startTime?: Date;
-		endTime?: Date;
-		description?: string;
-		duration?: number;
-	}[];
-	reminders?: {
-		id: string;
-		type: "absolute" | "relative";
-		description?: string;
-		/**
-		 * Field the reminder is relative to (e.g. 'due')
-		 */
-		relatedTo: "due" | "scheduled";
-		/**
-		 * ISO 8601 duration offset (e.g. '-PT1H').
-		 */
-		offset?: string;
-		absoluteTime?: Date;
-	};
-	blockedBy?: {
-		uid: string;
-		reltype: string;
-		gap?: string;
-	}[];
-	completeInstances?: Date[];
-	skippedInstances?: Date[];
-	icsEventId?: string;
-	googleCalendarEventId?: string;
-}
+export type StringFieldDefinition = BaseFieldDefinition & {
+	type: "string";
+};
 
-export type TaskNotesFieldRole = keyof Required<TaskNotesTask>;
+export type EnumFieldDefinition<TEnum = string> = BaseFieldDefinition & {
+	type: "enum";
+	values: TEnum[];
+	default?: TEnum;
+	tn_completed_values?: TEnum[];
+};
+
+export type DateFieldDefinition = BaseFieldDefinition & {
+	type: "date";
+};
+
+export type ListFieldDefinition = BaseFieldDefinition & {
+	type: "list";
+	items: FieldDefinition;
+};
+
+export type ObjectFieldDefinition = BaseFieldDefinition & {
+	type: "object";
+	fields: Record<string, FieldDefinition>;
+};
+
+export type LinkFieldDefinition = BaseFieldDefinition & {
+	type: "link";
+};
+
+export type IntegerFieldDefinition = BaseFieldDefinition & {
+	type: "integer";
+};
+
+export type DateTimeFieldDefinition = BaseFieldDefinition & {
+	type: "datetime";
+};
+
+export type ScalarFieldDefinition = 
+	| StringFieldDefinition
+	| EnumFieldDefinition
+	| ListFieldDefinition
+	| LinkFieldDefinition
+	| IntegerFieldDefinition
+	| DateTimeFieldDefinition;
 
 /**
  * Override FielDefinition with TaskNotes role
  */
-export type FieldDefinition = MdbaseFieldDefinition & {
-	tn_role?: TaskNotesFieldRole;
-	tn_completed_values?: TaskNotesTaskStatus[];
+export type FieldDefinition =
+	| StringFieldDefinition
+	| EnumFieldDefinition
+	| DateFieldDefinition
+	| ListFieldDefinition
+	| ObjectFieldDefinition
+	| LinkFieldDefinition
+	| IntegerFieldDefinition
+	| DateTimeFieldDefinition;
+
+export function isStringDefinition(definition: FieldDefinition): definition is StringFieldDefinition {
+	return definition.type === "string";
+}
+export function isEnumDefinition(definition: FieldDefinition): definition is EnumFieldDefinition {
+	return definition.type === "enum";
+}
+export function isDateDefinition(definition: FieldDefinition): definition is DateFieldDefinition {
+	return definition.type === "date";
+}
+export function isListDefinition(definition: FieldDefinition): definition is ListFieldDefinition {
+	return definition.type === "list";
+}
+export function isObjectDefinition(definition: FieldDefinition): definition is ObjectFieldDefinition {
+	return definition.type === "object";
+}
+export function isLinkDefinition(definition: FieldDefinition): definition is LinkFieldDefinition {
+	return definition.type === "link";
+}
+export function isIntegerDefinition(definition: FieldDefinition): definition is IntegerFieldDefinition {
+	return definition.type === "integer";
+}
+export function isDateTimeDefinition(definition: FieldDefinition): definition is DateTimeFieldDefinition {
+	return definition.type === "datetime";
+}
+
+export function isScalarDefinition(definition: FieldDefinition): definition is ScalarFieldDefinition {
+	return !(isObjectDefinition(definition) || isListDefinition(definition));
 };
 
 /**

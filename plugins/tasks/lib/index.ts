@@ -4,6 +4,7 @@ export * from "./constants";
 export * from "./create-task";
 export * from "./format";
 export * from "./list-past";
+export * from "./list-project-tasks";
 export * from "./list-scheduled";
 export * from "./types";
 export * from "./update-task";
