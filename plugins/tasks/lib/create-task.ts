@@ -28,4 +28,6 @@ export async function createTask(
 		frontmatter: task,
 		body: "",
 	});
+
+	return task;
 }

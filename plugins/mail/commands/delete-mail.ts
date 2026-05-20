@@ -1,9 +1,11 @@
-import ms from "ms";
-import { cleanCache, memo } from "@/lib/cache";
+import { cleanCache } from "@/lib/cache";
+import { getLogger } from "@/lib/logger";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import { createClient } from "../lib/client";
 import { INBOX } from "../lib/constants";
 import { deleteMail } from "../lib/delete-mail";
+
+const logger = getLogger("events");
 
 type DeleteMailCommandArgs = {
 	id: string;
@@ -34,6 +36,8 @@ export async function deleteMailCommand({
 	await cleanCache(["listUnreadMailsQuery"]);
 
 	await mailClient.logout();
+
+	logger.info("DeletedMail", { id });
 
 	return out;
 }

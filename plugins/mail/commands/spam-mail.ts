@@ -1,8 +1,11 @@
 import { cleanCache } from "@/lib/cache";
+import { getLogger } from "@/lib/logger";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import { createClient } from "../lib/client";
 import { INBOX } from "../lib/constants";
 import { spamMail } from "../lib/spam-mail";
+
+const logger = getLogger("events");
 
 type SpamMailCommandArgs = {
 	id: string;
@@ -33,6 +36,8 @@ export async function spamMailCommand({
 	await cleanCache(["listUnreadMailsQuery"]);
 
 	await mailClient.logout();
+
+	logger.info("SpamMail", { id });
 
 	return out;
 }

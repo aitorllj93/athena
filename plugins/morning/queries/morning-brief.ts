@@ -3,15 +3,6 @@ import { PluginRegistry } from "@/lib/plugins/registry";
 import { formatFullDate } from "@/lib/utils/date";
 import type { Format } from "@/lib/utils/render";
 
-// biome-ignore lint/suspicious/noExplicitAny: i18n translation function type
-let translator: any = null;
-async function getT() {
-	if (translator) return translator;
-	const { t } = await getTranslations("morning");
-	translator = t;
-	return t;
-}
-
 async function formatMorningBrief(
 	address: string,
 	forecast: string,
@@ -19,7 +10,7 @@ async function formatMorningBrief(
 	mails: string,
 	tasks: string,
 ) {
-	const t = await getT();
+	const { t } = await getTranslations("morning");
 	return `# ${t("brief")}
 
 ${formatFullDate(new Date().toISOString())}, ${address}
@@ -38,7 +29,7 @@ ${tasks}
 ${mails}`;
 }
 
-export async function morningBriefCommand(
+export async function morningBriefQuery(
 	fields?: string[],
 	format?: Format,
 ): Promise<string> {

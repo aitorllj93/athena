@@ -36,7 +36,7 @@ await configure({
 	loggers: [
 		{ category: ["logtape", "meta"], sinks: ["meta"], lowestLevel: "warning" },
 		{ category: [], sinks: ["file"], lowestLevel: "debug" },
-		{ category: ["events"], sinks: ["webhook", "file"], lowestLevel: "info" },
+		{ category: ["events"], sinks: WEBHOOK_URL ? ["webhook", "file"] : ["file"], lowestLevel: "info" },
 	],
 });
 

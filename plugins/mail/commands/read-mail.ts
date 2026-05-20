@@ -1,4 +1,5 @@
 import { cleanCache } from "@/lib/cache";
+import { getLogger } from "@/lib/logger";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import type { Format } from "@/lib/utils/render";
 import {
@@ -10,6 +11,8 @@ import {
 } from "../lib";
 import { createClient } from "../lib/client";
 import { INBOX } from "../lib/constants";
+
+const logger = getLogger("events");
 
 type ReadMailCommandArgs = {
 	id: string;
@@ -58,6 +61,8 @@ export async function readMailCommand({
 	await cleanCache(["listUnreadMailsQuery"]);
 
 	await mailClient.logout();
+
+	logger.info("ReadMail", { id });
 
 	return out;
 }

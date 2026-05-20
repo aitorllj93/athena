@@ -1,6 +1,7 @@
 import z from "zod";
 import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
+import { confirmAssistanceCommand } from "./commands/confirm-assistance";
 import type { CalendarEventFields } from "./lib";
 import { listUpcomingEventsQuery } from "./queries";
 
@@ -33,6 +34,16 @@ const calendar = router({
 					skipCache: input.skipCache,
 				},
 			);
+		}),
+	confirmAssistance: procedure
+		.meta({
+			description: "Confirm assistance to an event",
+		})
+		.input(z.tuple([z.string().describe("eventId")]))
+		.mutation(async ({ input: [eventId] }) => {
+			return confirmAssistanceCommand({
+				eventId,
+			});
 		}),
 	upcoming: procedure
 		.meta({

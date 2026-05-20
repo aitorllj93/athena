@@ -1,7 +1,7 @@
-import { morningBriefCommand } from "./commands/morning-brief";
 import enLocales from "./locales/en.json" with { type: "json" };
 import esLocales from "./locales/es.json" with { type: "json" };
 import pkg from "./package.json" with { type: "json" };
+import { morningBriefQuery } from "./queries/morning-brief";
 import router from "./router";
 
 export default {
@@ -10,7 +10,7 @@ export default {
 	version: pkg.version,
 	router,
 	commands: {
-		brief: morningBriefCommand,
+		brief: morningBriefQuery,
 	},
 	locales: {
 		es: esLocales,

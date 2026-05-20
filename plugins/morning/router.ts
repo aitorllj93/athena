@@ -1,7 +1,7 @@
 import z from "zod";
 import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
-import { morningBriefCommand } from "./commands/morning-brief";
+import { morningBriefQuery } from "./queries/morning-brief";
 
 const morning = router({
 	brief: procedure
@@ -15,7 +15,7 @@ const morning = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return morningBriefCommand(input.fields, input.format);
+			return morningBriefQuery(input.fields, input.format);
 		}),
 });
 

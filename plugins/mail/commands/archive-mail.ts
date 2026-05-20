@@ -1,9 +1,11 @@
-import ms from "ms";
-import { cleanCache, memo } from "@/lib/cache";
+import { cleanCache } from "@/lib/cache";
+import { getLogger } from "@/lib/logger";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import { archiveMail } from "../lib/archive-mail";
 import { createClient } from "../lib/client";
 import { INBOX } from "../lib/constants";
+
+const logger = getLogger("events");
 
 type ArchiveMailCommandArgs = {
 	id: string;
@@ -34,6 +36,8 @@ export async function archiveMailCommand({
 	await cleanCache(["listUnreadMailsQuery"]);
 
 	await mailClient.logout();
+
+	logger.info("ArchivedMail", { id });
 
 	return out;
 }
