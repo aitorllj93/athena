@@ -36,8 +36,12 @@ export const pluginsRouter = router({
 		.meta({
 			description: "Install plugin by name"
 		})
-		.input(z.string().describe("pluginName"))
-		.mutation(async ({ input }) => addPlugin(input)),
+		.input(
+			z.tuple([
+				z.string().describe("pluginName")
+			])
+		)
+		.mutation(async ({ input: [pluginName] }) => addPlugin(pluginName)),
 	remove: procedure
 		.meta({
 			aliases: {
@@ -45,8 +49,12 @@ export const pluginsRouter = router({
 			},
 			description: "Uninstall plugin by name"
 		})
-		.input(z.string().describe("pluginName"))
-		.mutation(async ({ input }) => removePlugin(input)),
+		.input(
+			z.tuple([
+				z.string().describe("pluginName")
+			])
+		)
+		.mutation(async ({ input: [pluginName] }) => removePlugin(pluginName)),
 });
 
 export default pluginsRouter;
