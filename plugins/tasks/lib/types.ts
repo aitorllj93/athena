@@ -83,6 +83,7 @@ export type Project = {
 }
 
 export type TaskFields = DeepKeys<Task>;
+export type ProjectFields = DeepKeys<Project>;
 
 export function toTask(task: QueryResult<TaskType> | ReadResult<TaskType>): Task {
 	const path = 'path' in task ? task.path : task.file.path;

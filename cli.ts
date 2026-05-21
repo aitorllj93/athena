@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { dispose } from "@logtape/logtape";
 
 import "@/lib/utils/workspace";
 import { createCli } from "trpc-cli";
@@ -18,10 +19,37 @@ await loadPlugins();
 const router = createAppRouter();
 
 // 4. Run the CLI
-const cli = createCli({ 
-  router,
-  name: Object.keys(pkg.bin)[0],
-  version: pkg.version,
-  description: pkg.description,
+const cli = createCli({
+	router,
+	name: Object.keys(pkg.bin)[0],
+	version: pkg.version,
+	description: pkg.description,
 });
-cli.run();
+
+class ProcessExit extends Error {
+  constructor(public code: number) {
+    super(`Process exited with code ${code}`);
+  }
+}
+
+let exitCode = 0;
+
+try {
+  await cli.run({
+    process: {
+      ...process,
+      exit(code?: number): never {
+        exitCode = code ?? 0;
+        throw new ProcessExit(exitCode);
+      },
+    },
+  });
+} catch (err) {
+  if (!(err instanceof ProcessExit)) {
+    throw err;
+  }
+} finally {
+  await dispose();
+}
+
+process.exit(exitCode);

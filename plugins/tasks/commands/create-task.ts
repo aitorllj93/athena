@@ -18,11 +18,13 @@ type CreateTaskCommandArgs = {
 export async function createTaskCommand(
 	args: CreateTaskCommandArgs,
 ): Promise<string> {
-	const out = "";
+	let out = "";
 
 	await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
 
 	const task = await createTask(db, args);
+
+	out += task.id;
 
 	await cleanCache(["listScheduledTasksQuery"]);
 

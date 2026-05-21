@@ -2,6 +2,7 @@
   "displayName": "Tareas",
   "description": "Interactúa con tus tareas de Obsidian a través TaskNotes (mdbase)",
   "unreadCount": "Hay {{total}} tareas pendientes",
+  "alreadyCompleted": "La tarea {{name}} ya está completada",
   "fields": {
     "block": "Bloque",
     "blockedBy": "Bloqueada por",

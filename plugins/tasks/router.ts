@@ -10,8 +10,9 @@ import {
 	createTaskCommand,
 	updateTaskCommand,
 } from "./commands";
-import type { TaskFields } from "./lib";
+import type { ProjectFields, TaskFields } from "./lib";
 import { listProjectTasksQuery, listScheduledTasksQuery } from "./queries";
+import { listProjectsQuery } from "./queries/list-projects";
 
 const offset = z
 	.union([z.string(), z.number()])
@@ -230,6 +231,42 @@ const tasks = router({
 					{
 						date: yesterday(),
 						fields: input.fields as TaskFields[],
+						format: input.format,
+						groupBy: input.groupBy
+							? {
+									property: input.groupBy,
+									direction: input.groupByDirection,
+								}
+							: undefined,
+						pagination: {
+							limit: input.limit,
+						},
+					},
+					{
+						skipCache: input.skipCache,
+					},
+				);
+			}),
+	}),
+	projects: router({
+		list: procedure
+			.meta({
+				description: "Display the projects",
+			})
+			.input(
+				z.object({
+					fields: datatypes.fields,
+					format: datatypes.format,
+					groupBy: datatypes.groupBy.optional(),
+					groupByDirection: datatypes.groupByDirection,
+					limit: datatypes.limit.default(10),
+					skipCache: z.boolean().optional(),
+				}),
+			)
+			.query(async ({ input }) => {
+				return listProjectsQuery(
+					{
+						fields: input.fields as ProjectFields[],
 						format: input.format,
 						groupBy: input.groupBy
 							? {

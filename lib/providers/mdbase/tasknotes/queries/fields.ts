@@ -13,6 +13,13 @@ import {
 import { TASKNOTES_TAGS } from "../constants";
 import type { TaskNotesFieldsMapping } from "../types";
 
+export const hasTitle = (
+	value: string,
+	{ status }: TaskNotesFieldsMapping,
+): QueryExpression => {
+	return strEquals(status.key, normalizeQueryValue(value, status.field));
+};
+
 export const hasStatus = (
 	value: string | string[],
 	{ status }: TaskNotesFieldsMapping,

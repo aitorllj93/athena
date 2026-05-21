@@ -7,7 +7,7 @@ import {
 	render,
 	renderGroup,
 } from "@/lib/utils/render";
-import type { Task, TaskFields } from "./types";
+import type { Project, ProjectFields, Task, TaskFields } from "./types";
 
 type FieldMap = {
 	[K in TaskFields]: DisplayFieldDefinition<Task, K>;
@@ -93,6 +93,24 @@ async function getColumnDefs() {
 	return columnDefs;
 }
 
+let projectColumnDefs: DisplayFieldDefinition<Project>[] | null = null;
+async function getProjectColumnDefs() {
+	if (projectColumnDefs) return projectColumnDefs;
+
+	const { t } = await getTranslations("tasks");
+
+	const columnDefsMap = new Map<ProjectFields, FieldMap[ProjectFields]>([
+		["name", { key: "id", label: t("fields.id") }],
+		["name", { key: "name", label: t("fields.name") }],
+		["name", { key: "path", label: t("fields.path") }],
+	]);
+
+	projectColumnDefs = Array.from(
+		columnDefsMap.values(),
+	) as DisplayFieldDefinition<Project>[];
+	return projectColumnDefs;
+}
+
 export async function formatTasks(
 	tasks: Task[],
 	format?: Format,
@@ -112,6 +130,39 @@ export async function formatTasksGroups(
 	fields?: TaskFields[],
 ) {
 	const colDefs = await getColumnDefs();
+	let out = "";
+
+	for (const group of groups) {
+		out += await renderGroup(group.key as string, group.items, {
+			columnDefinitions: colDefs,
+			fields,
+			format,
+		});
+		out += "\n\n";
+	}
+
+	return out;
+}
+
+export async function formatProjects(
+	projects: Project[],
+	format?: Format,
+	fields?: ProjectFields[],
+) {
+	const colDefs = await getProjectColumnDefs();
+	return render(projects, {
+		columnDefinitions: colDefs,
+		fields,
+		format,
+	});
+}
+
+export async function formatProjectsGroups(
+	groups: Group<Project>[],
+	format?: Format,
+	fields?: ProjectFields[],
+) {
+	const colDefs = await getProjectColumnDefs();
 	let out = "";
 
 	for (const group of groups) {
