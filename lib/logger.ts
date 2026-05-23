@@ -20,6 +20,10 @@ await configure({
 				return;
 			}
 
+			if (!record.message[0]) {
+				return;
+			}
+
 			const headers: Record<string, string> = {
 				"Content-Type": "application/json",
 			};

@@ -1,8 +1,6 @@
 {
   "displayName": "Tasks",
   "description": "Interact with your tasks from Obsidian using TaskNotes (mdbase)",
-  "unreadCount": "Found {{total}} pending tasks",
-  "alreadyCompleted": "Task {{name}} is already completed",
   "fields": {
     "block": "Block",
     "blockedBy": "Blocked by",
@@ -23,5 +21,15 @@
   },
   "status": {
     "open": "Open"
+  },
+  "messages": {
+    "unreadCount": "Found {{total}} pending tasks",
+    "alreadyCompleted": "Task {{name}} is already completed"
+  },
+  "events": {
+    "taskArchived": "The task was archived!",
+    "taskCompleted": "The task was completed!",
+    "taskCreated": "The task was created!",
+    "taskUodated": "The task was updated!"
   }
 }

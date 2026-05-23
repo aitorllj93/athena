@@ -1,8 +1,6 @@
 {
   "displayName": "Tareas",
   "description": "Interactúa con tus tareas de Obsidian a través TaskNotes (mdbase)",
-  "unreadCount": "Hay {{total}} tareas pendientes",
-  "alreadyCompleted": "La tarea {{name}} ya está completada",
   "fields": {
     "block": "Bloque",
     "blockedBy": "Bloqueada por",
@@ -23,5 +21,15 @@
   },
   "status": {
     "open": "Pendiente"
+  },
+  "messages": {
+    "unreadCount": "Hay {{total}} tareas pendientes",
+    "alreadyCompleted": "La tarea {{name}} ya está completada" 
+  },
+  "events": {
+    "taskArchived": "Archivaste la tarea!",
+    "taskCompleted": "Completaste la tarea!",
+    "taskCreated": "Creaste una nueva tarea!",
+    "taskUodated": "Actualizaste la tarea!"
   }
 }

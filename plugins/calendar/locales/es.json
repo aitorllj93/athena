@@ -6,5 +6,8 @@
     "startTime": "Hora",
     "summary": "Descripción",
     "id": "ID"
+  },
+  "events": {
+    "eventAssistanceConfirmed": "Confirmaste tu asistencia al evento!"
   }
 }

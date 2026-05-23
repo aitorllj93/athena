@@ -1,4 +1,6 @@
 import { cleanCache } from "@/lib/cache";
+import { logEvent } from "@/lib/events";
+import { getTranslations } from "@/lib/i18n";
 import { getLogger } from "@/lib/logger";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import type { Format } from "@/lib/utils/render";
@@ -12,8 +14,6 @@ import {
 import { createClient } from "../lib/client";
 import { INBOX } from "../lib/constants";
 
-const logger = getLogger("events");
-
 type ReadMailCommandArgs = {
 	id: string;
 	archive?: boolean;
@@ -26,6 +26,8 @@ export async function readMailCommand({
 	fields = ["subject", "sender", "received", "body"],
 	format = "mdlist",
 }: ReadMailCommandArgs): Promise<string> {
+	const { t } = await getTranslations("mail");
+
 	let out = "";
 
 	const accessToken = getAccessToken();
@@ -62,7 +64,10 @@ export async function readMailCommand({
 
 	await mailClient.logout();
 
-	logger.info("ReadMail", { id });
+	logEvent("MailRead", {
+		message: t("events.mailRead"),
+		properties: { id },
+	});
 
 	return out;
 }

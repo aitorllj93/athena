@@ -45,7 +45,7 @@ export const listProjectTasksQuery = memo(
       groupBy,
     });
 
-    out += `${t("unreadCount", { total: page.total })}\n\n`;
+    out += `${t("messages.unreadCount", { total: page.total })}\n\n`;
 
     if (groups) {
       out += await formatTasksGroups(groups, format, fields);

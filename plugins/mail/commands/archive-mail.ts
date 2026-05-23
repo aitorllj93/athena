@@ -1,11 +1,10 @@
 import { cleanCache } from "@/lib/cache";
-import { getLogger } from "@/lib/logger";
+import { logEvent } from "@/lib/events";
+import { getTranslations } from "@/lib/i18n";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import { archiveMail } from "../lib/archive-mail";
 import { createClient } from "../lib/client";
 import { INBOX } from "../lib/constants";
-
-const logger = getLogger("events");
 
 type ArchiveMailCommandArgs = {
 	id: string;
@@ -13,6 +12,7 @@ type ArchiveMailCommandArgs = {
 export async function archiveMailCommand({
 	id,
 }: ArchiveMailCommandArgs): Promise<string> {
+	const { t } = await getTranslations("mail");
 	const out = "";
 
 	const accessToken = getAccessToken();
@@ -37,7 +37,10 @@ export async function archiveMailCommand({
 
 	await mailClient.logout();
 
-	logger.info("ArchivedMail", { id });
+	logEvent("MailArchived", {
+		message: t("events.mailArchived"),
+		properties: { id }
+	})
 
 	return out;
 }

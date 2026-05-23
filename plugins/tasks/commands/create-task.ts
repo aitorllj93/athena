@@ -1,9 +1,8 @@
 import { cleanCache } from "@/lib/cache";
-import { getLogger } from "@/lib/logger";
+import { logEvent } from "@/lib/events";
+import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
 import { createTask, MDBASE_COLLECTION_ROOT } from "../lib";
-
-const logger = getLogger("events");
 
 type CreateTaskCommandArgs = {
 	name: string;
@@ -18,6 +17,7 @@ type CreateTaskCommandArgs = {
 export async function createTaskCommand(
 	args: CreateTaskCommandArgs,
 ): Promise<string> {
+	const { t } = await getTranslations("tasks");
 	let out = "";
 
 	await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
@@ -28,7 +28,10 @@ export async function createTaskCommand(
 
 	await cleanCache(["listScheduledTasksQuery"]);
 
-	logger.info("TaskCreated", task);
+	logEvent("TaskCreated", {
+		message: t("events.taskCreated"),
+		properties: task,
+	});
 
 	return out;
 }

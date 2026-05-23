@@ -1,15 +1,18 @@
-
-import { getLogger } from "@/lib/logger";
-
-const logger = getLogger("events");
+import { logEvent } from "@/lib/events";
+import { getTranslations } from "@/lib/i18n";
 
 type ConfirmAssistanceCommandArgs = {
-  eventId: string
+	eventId: string;
 };
-export async function confirmAssistanceCommand(
-  { eventId }: ConfirmAssistanceCommandArgs
-) {
+export async function confirmAssistanceCommand({
+	eventId,
+}: ConfirmAssistanceCommandArgs) {
+  const { t } = await getTranslations("calendar");
 
-
-  logger.info("EventAssistanceConfirmed", { eventId });
+	logEvent("EventAssistanceConfirmed", { 
+    message: t("events.eventAssistanceConfirmed"),
+    properties: {
+      eventId
+    }
+   });
 }

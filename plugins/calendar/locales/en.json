@@ -6,5 +6,8 @@
     "startTime": "Time",
     "summary": "Summary",
     "id": "ID"
+  },
+  "events": {
+    "eventAssistanceConfirmed": "Assistance to the event confirmed!"
   }
 }

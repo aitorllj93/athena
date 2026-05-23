@@ -1,9 +1,8 @@
 import { cleanCache } from "@/lib/cache";
-import { getLogger } from "@/lib/logger";
+import { logEvent } from "@/lib/events";
+import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
 import { completeTask, MDBASE_COLLECTION_ROOT } from "../lib";
-
-const logger = getLogger("events");
 
 type CompleteTaskCommandArgs = {
 	archive?: boolean;
@@ -13,6 +12,7 @@ export async function completeTaskCommand({
 	archive,
 	name,
 }: CompleteTaskCommandArgs): Promise<string> {
+	const { t } = await getTranslations("tasks");
 	const out = "";
 
 	await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
@@ -20,8 +20,11 @@ export async function completeTaskCommand({
 	const task = await completeTask(db, { archive, name });
 
 	await cleanCache(["listScheduledTasksQuery"]);
-
-	logger.info("TaskCompleted", task);
+	
+	logEvent("TaskCompleted", {
+		message: t("events.taskCompleted"),
+		properties: task,
+	});
 
 	return out;
 }

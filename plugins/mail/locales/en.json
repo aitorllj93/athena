@@ -11,5 +11,11 @@
     "received": "Date",
     "subject": "Subject",
     "id": "ID"
+  },
+  "events": {
+    "mailArchived": "Message archived!",
+    "mailDeleted": "Message deleted!",
+    "mailMovedToSpam": "Message moved to spam!",
+    "mailRead": "Message read!"
   }
 }

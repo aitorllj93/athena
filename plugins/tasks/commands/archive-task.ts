@@ -1,9 +1,8 @@
 import { cleanCache } from "@/lib/cache";
-import { getLogger } from "@/lib/logger";
+import { logEvent } from "@/lib/events";
+import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
 import { archiveTask, MDBASE_COLLECTION_ROOT } from "../lib";
-
-const logger = getLogger("events");
 
 type ArchiveTaskCommandArgs = {
 	name: string;
@@ -11,6 +10,7 @@ type ArchiveTaskCommandArgs = {
 export async function archiveTaskCommand({
 	name,
 }: ArchiveTaskCommandArgs): Promise<string> {
+	const { t } = await getTranslations("tasks");
 	const out = "";
 
 	await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
@@ -19,7 +19,10 @@ export async function archiveTaskCommand({
 
 	await cleanCache(["listScheduledTasksQuery"]);
 
-	logger.info("TaskArchived", task);
+	logEvent("TaskArchived", {
+		message: t("events.taskArchived"),
+		properties: task,
+	});
 
 	return out;
 }

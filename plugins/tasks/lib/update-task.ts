@@ -1,5 +1,6 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
 import { buildTask } from "@/lib/providers/mdbase/tasknotes";
+import { lookupTask } from "./lookup-task";
 
 type UpdateTaskParams = {
 	name: string;
@@ -15,17 +16,24 @@ export async function updateTask(
 	db: Mdbase,
 	{ name, ...fields }: UpdateTaskParams,
 ) {
+	const task = await lookupTask(db, { taskNameOrId: name });
+	
 	const typeDef = await db.getType("task");
 
-	const task = buildTask(typeDef, {
+	const dto = buildTask(typeDef, {
 		...fields,
 		title: fields.title ?? name,
 	});
-	// TODO: Lookup for path instead of generating
 
-	await db.collection.update({
-		path: db.resolvePath(typeDef, name),
-		fields: task,
+	const res = await db.collection.update({
+		path: task.path,
+		fields: dto,
 		body: "",
 	});
+
+	if (res.error) {
+		throw new Error(res.error.message);
+	}
+
+	return task;
 }

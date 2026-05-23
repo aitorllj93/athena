@@ -1,4 +1,6 @@
 import { cleanCache } from "@/lib/cache";
+import { logEvent } from "@/lib/events";
+import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
 import { MDBASE_COLLECTION_ROOT, updateTask } from "../lib";
 
@@ -15,13 +17,21 @@ type UpdateTaskCommandArgs = {
 export async function updateTaskCommand(
 	args: UpdateTaskCommandArgs,
 ): Promise<string> {
-	const out = "";
+	const { t } = await getTranslations("tasks");
+	let out = "";
 
 	await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
 
-	await updateTask(db, args);
+	const task = await updateTask(db, args);
+
+	out += task.id;
 
 	await cleanCache(["listScheduledTasksQuery"]);
+
+	logEvent("TaskUpdated", {
+		message: t("events.taskUpdated"),
+		properties: task,
+	});
 
 	return out;
 }
