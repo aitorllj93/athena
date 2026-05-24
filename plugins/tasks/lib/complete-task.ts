@@ -20,7 +20,7 @@ export async function completeTask(
 	const fields = getTaskNotesFields(typeDef);
 
 	if (task.status === "done") {
-		console.log(t("alreadyCompleted", { name }));
+		console.log(t("messages.alreadyCompleted", { name }));
 		return task;
 	}
 
