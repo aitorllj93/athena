@@ -1,9 +1,15 @@
 import { basename, extname } from "node:path";
+import type {
+	TaskNotesTask,
+	TaskNotesTaskStatus,
+} from "@/lib/providers/mdbase/tasknotes";
 import type { Group } from "@/lib/utils/group";
 import type { DeepKeys } from "@/lib/utils/object";
 import { generateProjectId } from "./generate-project-id";
 
-export type QueryResult<T extends Record<string, unknown> = Record<string, unknown>> = {
+export type QueryResult<
+	T extends Record<string, unknown> = Record<string, unknown>,
+> = {
 	path: string;
 	type: string;
 	frontmatter?: Record<string, unknown>;
@@ -11,7 +17,9 @@ export type QueryResult<T extends Record<string, unknown> = Record<string, unkno
 	body?: string | null;
 } & T;
 
-export type ReadResult<T extends Record<string, unknown> = Record<string, unknown>> = {
+export type ReadResult<
+	T extends Record<string, unknown> = Record<string, unknown>,
+> = {
 	file: {
 		path: string;
 	};
@@ -20,29 +28,40 @@ export type ReadResult<T extends Record<string, unknown> = Record<string, unknow
 	body?: string | null;
 } & T;
 
-export type QueryResultGroup<T extends Record<string, unknown> = Record<string, unknown>> = {
+export type QueryResultGroup<
+	T extends Record<string, unknown> = Record<string, unknown>,
+> = {
 	key: string;
 	results: QueryResult<T>[];
 };
 
-export type TaskStatus = "open" | "done";
-
-export type TaskType = {
+export type TaskType = TaskNotesTask & {
 	id?: string;
-	status?: TaskStatus;
-	projects?: string[];
-	priority?: string;
-	timeEstimate?: number;
-	dateCreated?: string;
-	dateModified?: string;
-	blockedBy?: {
-		uid: string;
-		reltype: "FINISHTOSTART";
-	}[];
-	contexts?: string[];
+	status?: TaskNotesTaskStatus;
+	/**
+	 * @deprecated use contexts instead
+	 */
 	block?: string;
-	recurrence_anchor?: string;
-	tags?: string[];
+};
+
+export type TaskBlocker = {
+	uid: string;
+	reltype: "FINISHTOSTART";
+	gap?: string;
+};
+
+export type TaskStatus =
+	| "open"
+	| "in-progress"
+	| "done"
+	| "wont-do"
+	| "blocked";
+
+export type TaskTimeEntry = {
+	startTime?: Date;
+	endTime?: Date;
+	description?: string;
+	duration?: number;
 };
 
 export type Task = {
@@ -52,11 +71,9 @@ export type Task = {
 	status: TaskStatus;
 	projects?: string[];
 	priority?: string;
+	timeEntries?: TaskTimeEntry[];
 	timeEstimate?: number;
-	blockedBy?: {
-		uid: string;
-		reltype: "FINISHTOSTART";
-	}[];
+	blockedBy?: TaskBlocker[];
 	contexts?: string[];
 	/**
 	 * @deprecated use contexts instead
@@ -80,13 +97,15 @@ export type Project = {
 	path: string;
 	name: string;
 	id: string;
-}
+};
 
 export type TaskFields = DeepKeys<Task>;
 export type ProjectFields = DeepKeys<Project>;
 
-export function toTask(task: QueryResult<TaskType> | ReadResult<TaskType>): Task {
-	const path = 'path' in task ? task.path : task.file.path;
+export function toTask(
+	task: QueryResult<TaskType> | ReadResult<TaskType>,
+): Task {
+	const path = "path" in task ? task.path : task.file.path;
 	return {
 		id: task.id,
 		path,
@@ -94,6 +113,7 @@ export function toTask(task: QueryResult<TaskType> | ReadResult<TaskType>): Task
 		status: task.status ?? "open",
 		projects: task.projects,
 		priority: task.priority,
+		timeEntries: task.timeEntries,
 		timeEstimate: task.timeEstimate,
 		blockedBy: task.blockedBy,
 		block: task.block,
@@ -102,18 +122,17 @@ export function toTask(task: QueryResult<TaskType> | ReadResult<TaskType>): Task
 	};
 }
 
-export function toTaskGroup(
-	group: QueryResultGroup<TaskType>,
-): Group<Task> {
+export function toTaskGroup(group: QueryResultGroup<TaskType>): Group<Task> {
 	return {
 		key: group.key,
 		items: group.results.map(toTask),
 	};
 }
 
-
-export function toProject(project: QueryResult<ProjectType> | ReadResult<ProjectType>): Project {
-	const path = 'path' in project ? project.path : project.file.path;
+export function toProject(
+	project: QueryResult<ProjectType> | ReadResult<ProjectType>,
+): Project {
+	const path = "path" in project ? project.path : project.file.path;
 	const name = basename(path, extname(path));
 	return {
 		path,

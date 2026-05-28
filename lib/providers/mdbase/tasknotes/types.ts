@@ -8,6 +8,8 @@ export type TaskNotesTaskStatus =
   | "wont-do"
   | "blocked";
 
+export type TaskNotesTaskBlockerRelType = "FINISHTOSTART";
+
 export type TaskNotesTaskReminder = {
   id: string;
   type: "absolute" | "relative";
@@ -32,7 +34,7 @@ export type TaskNotesTaskTimeEntry = {
 
 export type TaskNotesTaskBlocker = {
   uid: string;
-  reltype: string;
+  reltype: TaskNotesTaskBlockerRelType;
   gap?: string;
 };
 
