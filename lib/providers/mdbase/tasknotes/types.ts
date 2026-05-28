@@ -26,8 +26,8 @@ export type TaskNotesTaskReminder = {
 }
 
 export type TaskNotesTaskTimeEntry = {
-  startTime?: Date;
-  endTime?: Date;
+  startTime?: string;
+  endTime?: string;
   description?: string;
   duration?: number;
 };

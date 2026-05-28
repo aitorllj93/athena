@@ -58,8 +58,8 @@ export type TaskStatus =
 	| "blocked";
 
 export type TaskTimeEntry = {
-	startTime?: Date;
-	endTime?: Date;
+	startTime?: string;
+	endTime?: string;
 	description?: string;
 	duration?: number;
 };

@@ -10,17 +10,18 @@ import {
 	createTaskCommand,
 	updateTaskCommand,
 } from "./commands";
+import { trackTaskCommand } from "./commands/track-task";
 import type { ProjectFields, TaskFields } from "./lib";
 import { listProjectTasksQuery, listScheduledTasksQuery } from "./queries";
 import { listProjectsQuery } from "./queries/list-projects";
 
 const offset = z
 	.union([z.string(), z.number()])
-	.transform(v => 
-		msToIsoDuration(typeof v === "number" ? v * 1000 : ms(v as ms.StringValue))
+	.transform((v) =>
+		msToIsoDuration(typeof v === "number" ? v * 1000 : ms(v as ms.StringValue)),
 	);
 
-z.iso.duration()
+z.iso.duration();
 
 const priority = z
 	.enum(["minimum", "low", "none", "medium", "high", "maximum"])
@@ -53,9 +54,7 @@ const tasks = router({
 	archive: procedure
 		.meta({
 			description: "Archive a task and mark it as won't do",
-			examples: [
-				"archive PKM-1",
-			],
+			examples: ["archive PKM-1"],
 		})
 		.input(z.tuple([z.string().describe("taskNameOrId")]))
 		.mutation(async ({ input: [name] }) => {
@@ -79,7 +78,7 @@ const tasks = router({
 						limit: datatypes.limit.default(10),
 						skipCache: z.boolean().optional(),
 					}),
-				])
+				]),
 			)
 			.query(async ({ input: [projectName, params] }) => {
 				return listProjectTasksQuery(
@@ -287,9 +286,7 @@ const tasks = router({
 	complete: procedure
 		.meta({
 			description: "Complete a task",
-			examples: [
-				"complete PKM-1",
-			],
+			examples: ["complete PKM-1"],
 		})
 		.input(
 			z.tuple(
@@ -321,8 +318,8 @@ const tasks = router({
 			},
 			examples: [
 				'create "Pay rent tomorrow 9am #finance @home +admin every month"',
-				'create "Pagar el alquiler mañana 9am #finanzas @casa +admin todos los meses"'
-			]
+				'create "Pagar el alquiler mañana 9am #finanzas @casa +admin todos los meses"',
+			],
 		})
 		.input(
 			z.tuple([
@@ -388,10 +385,7 @@ const tasks = router({
 	estimate: procedure
 		.meta({
 			description: "Estimate a task",
-			examples: [
-				"estimate PKM-1 3h",
-				"estimate PKM-2 20m",
-			],
+			examples: ["estimate PKM-1 3h", "estimate PKM-2 20m"],
 		})
 		.input(
 			z.tuple([
@@ -402,16 +396,13 @@ const tasks = router({
 		.mutation(async ({ input: [name, timeEstimate] }) => {
 			return updateTaskCommand({
 				name,
-				timeEstimate
+				timeEstimate,
 			});
 		}),
 	block: procedure
 		.meta({
 			description: "Set a task blocker",
-			examples: [
-				"block PKM-1 PKM-2",
-				"block PKM-1 PKM-2,PKM-3",
-			],
+			examples: ["block PKM-1 PKM-2", "block PKM-1 PKM-2,PKM-3"],
 		})
 		.input(
 			z.tuple([
@@ -420,19 +411,19 @@ const tasks = router({
 				z.object({
 					reltype: z.string().optional(),
 					gap: z.string().optional(),
-				})
+				}),
 			]),
 		)
 		.mutation(async ({ input: [name, blocker, scheduled] }) => {
 			// TODO: Implement block command
-			throw new Error('Method not implemented')
+			throw new Error("Method not implemented");
 		}),
 	remind: procedure
 		.meta({
 			description: "Set a task reminder",
 			examples: [
 				"remind PKM-1 --when scheduled --before 30m",
-				'remind PKM-2 --at "12:30"'
+				'remind PKM-2 --at "12:30"',
 			],
 		})
 		.input(
@@ -444,19 +435,17 @@ const tasks = router({
 					after: offset.optional(),
 					before: offset.optional(),
 					at: z.iso.datetime().optional(),
-				})
+				}),
 			]),
 		)
 		.mutation(async ({ input: [name, description, scheduled] }) => {
 			// TODO: Implement remind command
-			throw new Error('Method not implemented')
+			throw new Error("Method not implemented");
 		}),
 	schedule: procedure
 		.meta({
 			description: "Schedule a task",
-			examples: [
-				"schedule PKM-1 2026-12-31"
-			],
+			examples: ["schedule PKM-1 2026-12-31"],
 		})
 		.input(
 			z.tuple([
@@ -467,7 +456,7 @@ const tasks = router({
 		.mutation(async ({ input: [name, scheduled] }) => {
 			return updateTaskCommand({
 				name,
-				scheduled
+				scheduled,
 			});
 		}),
 	set: router({
@@ -476,13 +465,13 @@ const tasks = router({
 				description: "Set Context for a task",
 				examples: [
 					"set context PKM-1 management",
-					"set context PKM-2 creativity,home"
+					"set context PKM-2 creativity,home",
 				],
 			})
 			.input(
 				z.tuple([
 					z.string().describe("taskNameOrId"),
-					commaSeparatedValues.describe("contexts")
+					commaSeparatedValues.describe("contexts"),
 				]),
 			)
 			.mutation(async ({ input: [name, contexts] }) => {
@@ -494,35 +483,29 @@ const tasks = router({
 		priority: procedure
 			.meta({
 				description: "Set Priority for a task",
-				examples: [
-					"set priority PKM-1 low",
-					"set priority PKM-2 high"
-				],
+				examples: ["set priority PKM-1 low", "set priority PKM-2 high"],
 			})
 			.input(
 				z.tuple([
 					z.string().describe("taskNameOrId"),
-					priority.describe("priority")
+					priority.describe("priority"),
 				]),
 			)
 			.mutation(async ({ input: [name, priority] }) => {
 				return updateTaskCommand({
 					name,
-					priority
+					priority,
 				});
 			}),
 		project: procedure
 			.meta({
 				description: "Set Project for a task",
-				examples: [
-					"set project PKM-1 BBL",
-					"set project PKM-2 PKM,BBL"
-				],
+				examples: ["set project PKM-1 BBL", "set project PKM-2 PKM,BBL"],
 			})
 			.input(
 				z.tuple([
 					z.string().describe("taskNameOrId"),
-					commaSeparatedValues.describe("projects")
+					commaSeparatedValues.describe("projects"),
 				]),
 			)
 			.mutation(async ({ input: [name, projects] }) => {
@@ -534,9 +517,7 @@ const tasks = router({
 		due: procedure
 			.meta({
 				description: "Set Due for a task",
-				examples: [
-					"set due PKM-1 2026-12-31"
-				],
+				examples: ["set due PKM-1 2026-12-31"],
 			})
 			.input(
 				z.tuple([
@@ -560,15 +541,18 @@ const tasks = router({
 				z.string().describe("taskNameOrId"),
 				z.string().describe("description").optional(),
 				z.object({
-					startTime: z.iso.datetime().optional(),
-					endTime: z.iso.datetime().optional(),
-					duration: duration.optional(),
-				})
+					startTime: z.iso.time().optional(),
+					endTime: z.iso.time().optional(),
+				}),
 			]),
 		)
 		.mutation(async ({ input: [name, description, scheduled] }) => {
-			// TODO: Implement block command
-			throw new Error('Method not implemented')
+			return trackTaskCommand({
+				name,
+				description,
+				startTime: scheduled.startTime,
+				endTime: scheduled.endTime,
+			});
 		}),
 });
 

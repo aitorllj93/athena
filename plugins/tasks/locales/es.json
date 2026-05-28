@@ -30,6 +30,7 @@
     "taskArchived": "Archivaste la tarea!",
     "taskCompleted": "Completaste la tarea!",
     "taskCreated": "Creaste una nueva tarea!",
-    "taskUodated": "Actualizaste la tarea!"
+    "taskUodated": "Actualizaste la tarea!",
+    "taskTimeTracked": "Registraste tiempo en la tarea!"
   }
 }

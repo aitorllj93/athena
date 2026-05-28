@@ -30,6 +30,7 @@
     "taskArchived": "The task was archived!",
     "taskCompleted": "The task was completed!",
     "taskCreated": "The task was created!",
-    "taskUodated": "The task was updated!"
+    "taskUodated": "The task was updated!",
+    "taskTimeTracked": "Task time registered!"
   }
 }
