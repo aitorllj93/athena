@@ -80,9 +80,21 @@ export function loadEnv() {
           ) {
             val = val.slice(1, -1);
           }
+
+          // TODO: Remove these overrides
+          // If these keys are defined on the env, they take preference
+          const PREFERRED_KEYS = [
+            "MDBASE_COLLECTION_ROOT",
+            "WEBHOOK_URL",
+          ]
+
+          if (PREFERRED_KEYS.includes(key)) {
+            process.env[key] = process.env[key] ?? val;
+          } else {
+            // Populate env if not already set, or override defaults
+            process.env[key] = val;
+          }
           
-          // Populate env if not already set, or override defaults
-          process.env[key] = val;
         }
       }
     }

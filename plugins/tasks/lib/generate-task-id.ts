@@ -1,23 +1,23 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
 import { generateProjectId } from "./generate-project-id";
-import { getProject } from "./get-project";
 import { listTasks } from "./list-tasks";
+import type { Project } from "./types";
 
 const DEFAULT_PREFIX = "TSK";
 
 type GenerateTaskIdParams = {
-	projectName?: string;
+	project?: Project;
 };
 export async function generateTaskId(
 	db: Mdbase,
-	{ projectName }: GenerateTaskIdParams,
+	{ project }: GenerateTaskIdParams,
 ): Promise<string> {
 	let prefix = DEFAULT_PREFIX;
 	let maxId = 0;
 
 	const { data: previousTasks } = await listTasks(db, {
-		filters: projectName
-			? { projects: [projectName] }
+		filters: project
+			? { projects: [project.name] }
 			: { hasAnyProject: false },
 		orderBy: {
 			field: "dateCreated",
@@ -25,11 +25,8 @@ export async function generateTaskId(
 		},
 	});
 
-	if (projectName) {
-		const project = await getProject(db, {
-			projectName,
-		}).catch(() => null);
-		prefix = project?.id ?? generateProjectId(projectName);
+	if (project) {
+		prefix = project?.id ?? generateProjectId(project.name);
 	}
 
 	if (previousTasks) {

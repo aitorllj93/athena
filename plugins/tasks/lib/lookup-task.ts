@@ -1,11 +1,11 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
-import { union } from "@/lib/providers/mdbase/queries";
+import { strEquals, union } from "@/lib/providers/mdbase/queries";
 import {
 	getTaskNotesFields,
 	hasTitle,
 	TASKNOTES_TYPES,
 } from "@/lib/providers/mdbase/tasknotes";
-import { type QueryResult, type Task, toTask } from "./types";
+import { fromTaskNoteResult, type QueryResult, type Task } from "./types";
 
 type LookUpTaskParams = {
 	taskNameOrId: string;
@@ -20,9 +20,9 @@ export async function lookupTask(
 	const found = await db.collection.query({
 		types: [TASKNOTES_TYPES.TASK],
 		where: union([
-			`id == "${taskNameOrId}"`,
+			strEquals(fields.id.key, `"${taskNameOrId}"`),
 			hasTitle(taskNameOrId, fields),
-			`file.basename == "${taskNameOrId}"`,
+			strEquals("file.basename", `"${taskNameOrId}"`),
 		]),
 	});
 
@@ -36,5 +36,5 @@ export async function lookupTask(
 		throw new Error(`Task with name or id "${taskNameOrId}" not found`);
 	}
 
-	return toTask(existing as QueryResult);
+	return fromTaskNoteResult(fields, existing as QueryResult);
 }

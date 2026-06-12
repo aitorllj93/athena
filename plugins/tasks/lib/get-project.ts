@@ -2,6 +2,7 @@ import type { Mdbase } from "@/lib/providers/mdbase";
 import { strEquals, union } from "@/lib/providers/mdbase/queries";
 import {
 	getTaskNotesFields,
+	hasTitle,
 	TASKNOTES_TYPES,
 } from "@/lib/providers/mdbase/tasknotes";
 import { fromMDBaseProjectResult, type Project, type QueryResult } from "./types";
@@ -14,22 +15,28 @@ export async function getProject(
 	params: GetProjectParams,
 ): Promise<Project> {
 	const typeDef = await db.getType(TASKNOTES_TYPES.PROJECT);
+	const fields = getTaskNotesFields(typeDef);
+	const path = db.resolvePath(typeDef, fields, params.projectName);
 
-	const fieldDefs = getTaskNotesFields(typeDef);
-	const path = db.resolvePath(typeDef, fieldDefs, params.projectName);
-
-	const projects = await db.collection.query({
+	const found = await db.collection.query({
 		types: [TASKNOTES_TYPES.PROJECT],
 		where: union([
+			strEquals(fields.id.key, `"${params.projectName}"`),
+			hasTitle(params.projectName, fields),
 			strEquals("file.path", `"${path}"`),
 			// strEquals("file.basename", `"${params.projectName}"`),
-			strEquals(fieldDefs.id.key, `"${params.projectName}"`),
 		]),
 	});
 
-	if (!projects.results || projects.results?.length <= 0) {
-		throw new Error(`Could not find project named "${params.projectName}"`);
+	if (found.error) {
+		throw new Error(found.error.message);
 	}
 
-	return fromMDBaseProjectResult(fieldDefs, projects.results[0] as QueryResult);
+	const existing = found.results?.[0];
+
+	if (!existing) {
+		throw new Error(`Project with name or id "${params.projectName}" not found`);
+	}
+
+	return fromMDBaseProjectResult(fields, existing as QueryResult);
 }

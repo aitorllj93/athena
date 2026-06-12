@@ -8,7 +8,8 @@ import {
 } from "@/lib/providers/mdbase/tasknotes";
 
 import { generateTaskId } from "./generate-task-id";
-import { fromTaskNote, toTask } from "./types";
+import { getProject } from "./get-project";
+import { fromTaskNote } from "./types";
 
 type CreateTaskParams = {
 	name: string;
@@ -36,12 +37,25 @@ export async function createTask(
 		title: parsed.title ?? fields.title ?? name,
 	};
 
+	const project = dto.projects?.[0]
+		? await getProject(db, {
+				projectName: dto.projects?.[0],
+			}).catch(() => undefined)
+		: undefined;
+
+	if (project && dto.projects) {
+		dto.projects[0] =	project.id;
+	}
 
 	const fieldDefs = getTaskNotesFields(typeDef);
 	const taskNote = buildTask(typeDef, dto);
-	taskNote[fieldDefs.id.key] = await generateTaskId(db, { projectName: dto.projects?.[0] });
+	taskNote[fieldDefs.id.key] = await generateTaskId(db, { project });
 
-	const path = db.resolvePath(typeDef, fieldDefs, `${taskNote[fieldDefs.id.key]} ${taskNote[fieldDefs.title.key]}`);
+	const path = db.resolvePath(
+		typeDef,
+		fieldDefs,
+		`${taskNote[fieldDefs.id.key]} ${taskNote[fieldDefs.title.key]}`,
+	);
 
 	const result = await db.collection.create({
 		path,
