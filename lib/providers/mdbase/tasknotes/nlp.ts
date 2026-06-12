@@ -1,13 +1,16 @@
 import { nanoid } from "nanoid";
-import {
-	DEFAULT_NLP_TRIGGERS,
-	NaturalLanguageParserCore,
-	type ParsedTaskData,
-} from "tasknotes-nlp-core";
+import type { NaturalLanguageParserCore as NaturalLanguageParser, ParsedTaskData } from "tasknotes-nlp-core";
 import { getLanguage } from "@/lib/i18n";
 import type { TaskNotesTask, TaskNotesTaskReminder } from "./types";
 
+let parserInstance: NaturalLanguageParser | null = null;
+
 export function buildParser() {
+	const {
+		DEFAULT_NLP_TRIGGERS,
+		NaturalLanguageParserCore,
+	} = require("tasknotes-nlp-core") as typeof import("tasknotes-nlp-core");
+
 	const language = getLanguage();
 	const parser = new NaturalLanguageParserCore(
 		[],
@@ -19,7 +22,13 @@ export function buildParser() {
 
 	return parser;
 }
-const parser = buildParser();
+
+function getParser() {
+	if (!parserInstance) {
+		parserInstance = buildParser();
+	}
+	return parserInstance;
+}
 
 function parsedToTaskNotesTask(parsed: ParsedTaskData): TaskNotesTask {
 	const reminders: TaskNotesTaskReminder[] = [];
@@ -58,7 +67,7 @@ function parsedToTaskNotesTask(parsed: ParsedTaskData): TaskNotesTask {
 }
 
 export function parse(value: string): TaskNotesTask {
-	const parsed = parser.parseInput(value);
+	const parsed = getParser().parseInput(value);
 
 	return parsedToTaskNotesTask(parsed);
 }

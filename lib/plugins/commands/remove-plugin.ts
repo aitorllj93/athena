@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { getTranslations } from "@/lib/i18n";
 import { findProjectRoot } from "@/lib/utils/workspace";
+import { generateManifest } from "../manifest-generator";
 
 export async function removePlugin(pluginName: string) {
 	const { t } = await getTranslations("common", {
@@ -47,6 +48,7 @@ export async function removePlugin(pluginName: string) {
 			cwd: rootDir,
 			stdio: "inherit",
 		});
+		generateManifest();
 		return t("pluginRemoved", {
 			pluginName
 		})

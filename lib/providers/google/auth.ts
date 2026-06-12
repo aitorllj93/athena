@@ -1,6 +1,5 @@
 import { rm } from "node:fs/promises";
 import type { OAuth2Client } from "google-auth-library";
-import { google } from "googleapis";
 import ms from "ms";
 import { getTranslations } from "@/lib/i18n";
 import {
@@ -249,6 +248,7 @@ export function getOAuthClient(): OAuth2Client {
 	}
 
 	const credentials = getCredentials();
+	const { google } = require("googleapis") as typeof import("googleapis");
 	const client = new google.auth.OAuth2(
 		credentials.client_id,
 		credentials.client_secret,

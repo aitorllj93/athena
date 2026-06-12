@@ -21,11 +21,13 @@
     "typescript": "^5"
   },
   "bin": {
-    "athena": "./dist/cli"
+    "athena": "./cli.ts"
   },
   "scripts": {
     "docs:gen": "bun run scripts/generate-docs.ts",
     "dev": "bun run cli.ts",
+    "manifest:gen": "bun run scripts/generate-manifest.ts",
+    "postinstall": "bun run manifest:gen",
     "build": "bun build --compile --compile-autoload-tsconfig --compile-autoload-package-json --minify-whitespace --minify-syntax --target bun --outfile dist/cli cli.ts"
   },
   "dependencies": {

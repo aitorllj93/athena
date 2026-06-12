@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { getTranslations } from "@/lib/i18n";
 import { findProjectRoot } from "@/lib/utils/workspace";
+import { generateManifest } from "../manifest-generator";
 
 export async function addPlugin(pluginName: string) {
 	const { t } = await getTranslations("common", {
@@ -35,6 +36,7 @@ export async function addPlugin(pluginName: string) {
 				cwd: rootDir,
 				stdio: "inherit",
 			});
+			generateManifest();
 			return t("installed", {
 				pluginName,
 			});
@@ -55,6 +57,7 @@ export async function addPlugin(pluginName: string) {
 				cwd: rootDir,
 				stdio: "inherit",
 			});
+			generateManifest();
 			return t("installed", {
 				pluginName,
 			});
