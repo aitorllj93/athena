@@ -187,6 +187,54 @@ export function toTaskGroup(group: QueryResultGroup<TaskType>): Group<Task> {
 	};
 }
 
+export function fromMDBaseProject(
+	fieldDefs: Record<
+		keyof ExtendedTaskNotesTask,
+		{
+			key: string;
+			field: FieldDefinition;
+		}
+	>,
+	task: Record<string, unknown>,
+	path?: string,
+): Project {
+	return {
+		id: task[fieldDefs.id.key] as string,
+		path: path ?? "" as string,
+		name: task[fieldDefs.title.key] as string ?? (path ? basename(path, extname(path)) : "") as string,
+	};
+}
+
+export function fromMDBaseProjectResult(
+	fieldDefs: Record<
+		keyof ExtendedTaskNotesTask,
+		{
+			key: string;
+			field: FieldDefinition;
+		}
+	>,
+	task: QueryResult<Record<string, unknown>> | ReadResult<Record<string, unknown>>,
+): Project {
+	const path = "path" in task ? task.path : task.file.path;
+	return fromMDBaseProject(fieldDefs, task, path as string);
+}
+
+export function fromMDBaseProjectResultGroup(
+	fieldDefs: Record<
+		keyof ExtendedTaskNotesTask,
+		{
+			key: string;
+			field: FieldDefinition;
+		}
+	>,
+	group: QueryResultGroup<Record<string, unknown>>,
+): Group<Project> {
+	return {
+		key: group.key,
+		items: group.results.map(r => fromMDBaseProjectResult(fieldDefs, r)),
+	};
+}
+
 export function toProject(
 	project: QueryResult<ProjectType> | ReadResult<ProjectType>,
 ): Project {

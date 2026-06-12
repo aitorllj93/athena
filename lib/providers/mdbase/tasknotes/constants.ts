@@ -2,7 +2,8 @@ import type { FieldDefinition } from "../types";
 import type { TaskNotesFieldRole } from "./types";
 
 export const TASKNOTES_TYPES = {
-  TASK: "task"
+  TASK: "task",
+  PROJECT: "project",
 } as const;
 
 export const TASKNOTES_STATUS = {
