@@ -1,4 +1,4 @@
-import type { TaskNotesFieldRole } from "./tasknotes/types";
+import type { ExtendedTaskNotesFieldRole, TaskNotesFieldRole } from "./tasknotes/types";
 import type { FieldDefinition } from "./types";
 
 export const TASKNOTES_FIELDS_DEFAULTS: Record<TaskNotesFieldRole, FieldDefinition> = {
@@ -200,3 +200,19 @@ export const TASKNOTES_FIELDS_DEFAULTS: Record<TaskNotesFieldRole, FieldDefiniti
     tn_role: "googleCalendarEventId"
   },
 };
+
+export const EXTENDED_TASKNOTES_FIELDS_DEFAULTS: Record<ExtendedTaskNotesFieldRole, FieldDefinition> = {
+  ...TASKNOTES_FIELDS_DEFAULTS,
+  type: {
+    type: "string",
+    required: true,
+    description: "Short summary of the task.",
+    tn_role: "type"
+  },
+  id: {
+    type: "string",
+    required: true,
+    description: "Short summary of the task.",
+    tn_role: "id"
+  },
+}

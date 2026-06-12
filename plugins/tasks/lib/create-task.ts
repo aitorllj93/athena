@@ -1,12 +1,14 @@
 import type { Mdbase } from "@/lib/providers/mdbase";
 import {
 	buildTask,
+	getTaskNotesFields,
 	parse,
 	TASKNOTES_TYPES,
 	type TaskNotesTask,
 } from "@/lib/providers/mdbase/tasknotes";
 
 import { generateTaskId } from "./generate-task-id";
+import { fromTaskNote, toTask } from "./types";
 
 type CreateTaskParams = {
 	name: string;
@@ -34,12 +36,16 @@ export async function createTask(
 		title: parsed.title ?? fields.title ?? name,
 	};
 
-	const task = buildTask(typeDef, dto);
-	task.id = await generateTaskId(db, { projectName: dto.projects?.[0] });
+
+	const fieldDefs = getTaskNotesFields(typeDef);
+	const taskNote = buildTask(typeDef, dto);
+	taskNote[fieldDefs.id.key] = await generateTaskId(db, { projectName: dto.projects?.[0] });
+
+	const path = db.resolvePath(typeDef, fieldDefs, `${taskNote[fieldDefs.id.key]} ${taskNote[fieldDefs.title.key]}`);
 
 	const result = await db.collection.create({
-		path: db.resolvePath(typeDef, `${task.id} ${parsed.title ?? name}`),
-		frontmatter: task,
+		path,
+		frontmatter: taskNote,
 		body: "",
 	});
 
@@ -47,5 +53,5 @@ export async function createTask(
 		throw new Error(result.error.message);
 	}
 
-	return task;
+	return fromTaskNote(fieldDefs, taskNote, path);
 }

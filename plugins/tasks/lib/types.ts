@@ -1,8 +1,10 @@
 import { basename, extname } from "node:path";
 import type {
+	ExtendedTaskNotesTask,
 	TaskNotesTask,
 	TaskNotesTaskStatus,
 } from "@/lib/providers/mdbase/tasknotes";
+import type { FieldDefinition } from "@/lib/providers/mdbase/types";
 import type { Group } from "@/lib/utils/group";
 import type { DeepKeys } from "@/lib/utils/object";
 import { generateProjectId } from "./generate-project-id";
@@ -101,6 +103,62 @@ export type Project = {
 
 export type TaskFields = DeepKeys<Task>;
 export type ProjectFields = DeepKeys<Project>;
+
+export function fromTaskNote(
+	fieldDefs: Record<
+		keyof ExtendedTaskNotesTask,
+		{
+			key: string;
+			field: FieldDefinition;
+		}
+	>,
+	task: Record<string, unknown>,
+	path?: string,
+): Task {
+	return {
+		id: task[fieldDefs.id.key] as string,
+		path: path ?? "" as string,
+		name: task[fieldDefs.title.key] as string ?? (path ? basename(path, extname(path)) : "") as string,
+		status: task[fieldDefs.status.key] as TaskStatus ?? fieldDefs.status.field.default as TaskStatus,
+		projects: task[fieldDefs.projects.key] as string[],
+		priority: task[fieldDefs.priority.key] as string,
+		timeEntries: task[fieldDefs.timeEntries.key] as TaskTimeEntry[],
+		timeEstimate: task[fieldDefs.timeEstimate.key] as number,
+		blockedBy: task[fieldDefs.blockedBy.key] as TaskBlocker[],
+		contexts: task[fieldDefs.contexts.key] as string[],
+		tags: task[fieldDefs.tags.key] as string[],
+	};
+}
+
+export function fromTaskNoteResult(
+	fieldDefs: Record<
+		keyof ExtendedTaskNotesTask,
+		{
+			key: string;
+			field: FieldDefinition;
+		}
+	>,
+	task: QueryResult<Record<string, unknown>> | ReadResult<Record<string, unknown>>,
+): Task {
+	const path = "path" in task ? task.path : task.file.path;
+	return fromTaskNote(fieldDefs, task, path as string);
+}
+
+export function fromTaskNoteResultGroup(
+	fieldDefs: Record<
+		keyof ExtendedTaskNotesTask,
+		{
+			key: string;
+			field: FieldDefinition;
+		}
+	>,
+	group: QueryResultGroup<Record<string, unknown>>,
+): Group<Task> {
+	return {
+		key: group.key,
+		items: group.results.map(r => fromTaskNoteResult(fieldDefs, r)),
+	};
+}
 
 export function toTask(
 	task: QueryResult<TaskType> | ReadResult<TaskType>,

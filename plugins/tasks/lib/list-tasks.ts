@@ -9,6 +9,8 @@ import type { Group, GroupByParams } from "@/lib/utils/group";
 import type { Pagination, PaginationParams } from "@/lib/utils/pagination";
 
 import {
+	fromTaskNoteResult,
+	fromTaskNoteResultGroup,
 	type QueryResult,
 	type QueryResultGroup,
 	type Task,
@@ -69,8 +71,8 @@ export async function listTasks(
 			: undefined,
 	});
 
-	const data = ((query.results as QueryResult[]) ?? [])?.map(toTask);
-	const groups = (query.groups as QueryResultGroup[])?.map(toTaskGroup);
+	const data = ((query.results as QueryResult[]) ?? [])?.map(r => fromTaskNoteResult(fields, r));
+	const groups = (query.groups as QueryResultGroup[])?.map(g => fromTaskNoteResultGroup(fields, g));
 
 	const total = query.meta?.total_count ?? data.length;
 
