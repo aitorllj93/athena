@@ -3,14 +3,18 @@ import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
 
 import {
-	archiveMailCommand,
-	deleteMailCommand,
-	readMailCommand,
-	spamMailCommand,
+	archiveMailMessageCommand,
+	deleteMailMessageCommand,
+	markAsSpamMailMessageCommand,
+	readMailMessageCommand,
 } from "./commands";
 import type { MailBoxFields, MailMessageFields } from "./lib";
-import { INBOX } from "./lib/constants";
-import { listBoxesQuery, listUnreadMailsQuery, openMailQuery } from "./queries";
+import { INBOX } from "./lib";
+import {
+	listBoxesQuery,
+	listUnreadMailMessagesQuery,
+	openMailMessageQuery,
+} from "./queries";
 
 const mail = router({
 	inbox: procedure
@@ -25,7 +29,7 @@ const mail = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUnreadMailsQuery(
+			return listUnreadMailMessagesQuery(
 				{
 					fields: input.fields as MailMessageFields[],
 					format: input.format,
@@ -75,7 +79,7 @@ const mail = router({
 			}),
 		)
 		.query(async ({ input }) => {
-			return listUnreadMailsQuery(
+			return listUnreadMailMessagesQuery(
 				{
 					box: input.box,
 					fields: input.fields as MailMessageFields[],
@@ -104,7 +108,7 @@ const mail = router({
 			]),
 		)
 		.query(async ({ input: [messageId, opts] }) => {
-			return openMailQuery({
+			return openMailMessageQuery({
 				id: messageId,
 				fields: opts.fields as MailMessageFields[],
 				format: opts.format,
@@ -124,7 +128,7 @@ const mail = router({
 			]),
 		)
 		.mutation(({ input: [messageId, opts] }) => {
-			return readMailCommand({
+			return readMailMessageCommand({
 				id: messageId,
 				fields: opts.fields as MailMessageFields[],
 				format: opts.format,
@@ -136,7 +140,7 @@ const mail = router({
 		})
 		.input(z.tuple([z.string().describe("messageId")]))
 		.mutation(({ input: [messageId] }) => {
-			return archiveMailCommand({
+			return archiveMailMessageCommand({
 				id: messageId,
 			});
 		}),
@@ -146,7 +150,7 @@ const mail = router({
 		})
 		.input(z.tuple([z.string().describe("messageId")]))
 		.mutation(({ input: [messageId] }) => {
-			return deleteMailCommand({
+			return deleteMailMessageCommand({
 				id: messageId,
 			});
 		}),
@@ -156,7 +160,7 @@ const mail = router({
 		})
 		.input(z.tuple([z.string().describe("messageId")]))
 		.mutation(({ input: [messageId] }) => {
-			return spamMailCommand({
+			return markAsSpamMailMessageCommand({
 				id: messageId,
 			});
 		}),

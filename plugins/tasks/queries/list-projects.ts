@@ -5,13 +5,13 @@ import { Mdbase } from "@/lib/providers/mdbase";
 import type { GroupByParams } from "@/lib/utils/group";
 import type { PaginationParams } from "@/lib/utils/pagination";
 import type { Format } from "@/lib/utils/render";
+
 import {
-  formatProjects,
-  formatProjectsGroups,
-  MDBASE_COLLECTION_ROOT,
-  type ProjectFields
+	formatProjects,
+	formatProjectsGroups,
+	MDBASE_COLLECTION_ROOT,
 } from "../lib";
-import { listProjects } from "../lib/list-projects";
+import { listProjects, type ProjectFields } from "../lib/projects";
 
 const CACHE_TTL = ms("2h");
 const CACHE_KEY = "listProjectsQuery";

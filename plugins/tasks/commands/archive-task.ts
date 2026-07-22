@@ -2,7 +2,9 @@ import { cleanCache } from "@/lib/cache";
 import { logEvent } from "@/lib/events";
 import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
-import { archiveTask, MDBASE_COLLECTION_ROOT } from "../lib";
+
+import { MDBASE_COLLECTION_ROOT } from "../lib";
+import { archiveTask } from "../lib/tasks";
 
 type ArchiveTaskCommandArgs = {
 	name: string;

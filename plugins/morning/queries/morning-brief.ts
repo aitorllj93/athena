@@ -1,67 +1,90 @@
-import { getTranslations } from "@/lib/i18n";
 import { PluginRegistry } from "@/lib/plugins/registry";
-import { formatFullDate } from "@/lib/utils/date";
 import type { Format } from "@/lib/utils/render";
+import { formatMorningBrief } from "../lib/format";
 
-async function formatMorningBrief(
-	address: string,
-	forecast: string,
-	events: string,
-	mails: string,
-	tasks: string,
-) {
-	const { t } = await getTranslations("morning");
-	return `# ${t("brief")}
-
-${formatFullDate(new Date().toISOString())}, ${address}
-${forecast}
-
-## ${t("agenda")}
-
-${events}
-
-## ${t("scheduled")}
-
-${tasks}
-
-## ${t("inbox")}
-
-${mails}`;
-}
-
+type MorningBriefQueryArgs = {
+	format?: Format;
+};
 export async function morningBriefQuery(
-	fields?: string[],
-	format?: Format,
+	{ format = "md" }: MorningBriefQueryArgs,
+	{ skipCache = true }: { skipCache?: boolean },
 ): Promise<string> {
 	let out = "";
 
-	// Fetch information dynamically from other registered plugins via the Registry!
 	const [address, forecast, events, mails, tasks] = await Promise.all([
-		PluginRegistry.runCommand("map.getAddress").catch(
-			() => "Map plugin not installed",
-		),
-		PluginRegistry.runCommand("weather.getForecast").catch(
-			() => "Weather plugin not installed",
-		),
-		PluginRegistry.runCommand("calendar.listUpcomingEvents", {
-			fields: ["startTime", "summary", "id"],
-			groupBy: {
-				property: "startDate"
-			}
-		}).catch(
-			() => "Calendar plugin not installed",
-		),
-		PluginRegistry.runCommand("mail.listUnreadMails").catch(
-			() => "Mail plugin not installed",
-		),
-		PluginRegistry.runCommand("tasks.listScheduledTasks", {
-			groupBy: {
-				property: "block"
-			} 
-		}).catch(
-			() => "Tasks plugin not installed",
-		),
+		PluginRegistry.runCommand(
+			"map.getAddress",
+			{
+				format,
+			},
+			{
+				skipCache,
+			},
+		).catch((err) => {
+			return JSON.stringify({ error: err.message });
+		}),
+		PluginRegistry.runCommand(
+			"weather.getForecast",
+			{
+				format,
+			},
+			{
+				skipCache,
+			},
+		).catch((err) => {
+			return JSON.stringify({ error: err.message });
+		}),
+		PluginRegistry.runCommand(
+			"calendar.listUpcomingEvents",
+			{
+				fields: ["startTime", "summary", "id"],
+				format,
+				groupBy: {
+					property: "startDate",
+				},
+			},
+			{
+				skipCache,
+			},
+		).catch((err) => {
+			return JSON.stringify({ error: err.message });
+		}),
+		PluginRegistry.runCommand(
+			"mail.listUnreadMails",
+			{
+				format,
+			},
+			{
+				skipCache,
+			},
+		).catch((err) => {
+			return JSON.stringify({ error: err.message });
+		}),
+		PluginRegistry.runCommand(
+			"tasks.listScheduledTasks",
+			{
+				format,
+				groupBy: {
+					property: "block",
+				},
+			},
+			{
+				skipCache,
+			},
+		).catch((err) => {
+			return JSON.stringify({ error: err.message });
+		}),
 	]);
+
+	if (format === "json") {
+		return JSON.stringify({
+			address: JSON.parse(address),
+			forecast: JSON.parse(forecast),
+			events: JSON.parse(events),
+			mails: JSON.parse(mails),
+			tasks: JSON.parse(tasks),
+		});
+	}
 
 	out = await formatMorningBrief(address, forecast, events, mails, tasks);
 

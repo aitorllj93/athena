@@ -7,7 +7,8 @@ import {
 	render,
 	renderGroup,
 } from "@/lib/utils/render";
-import type { CalendarEvent, CalendarEventFields } from "./types";
+
+import type { CalendarEvent, CalendarEventFields } from "./events";
 
 type FieldMap = {
 	[K in CalendarEventFields]: DisplayFieldDefinition<CalendarEvent, K>;

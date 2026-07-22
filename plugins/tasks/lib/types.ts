@@ -4,38 +4,10 @@ import type {
 	TaskNotesTask,
 	TaskNotesTaskStatus,
 } from "@/lib/providers/mdbase/tasknotes";
-import type { FieldDefinition } from "@/lib/providers/mdbase/types";
+import type { FieldDefinition, QueryResult, QueryResultGroup, ReadResult } from "@/lib/providers/mdbase/types";
 import type { Group } from "@/lib/utils/group";
 import type { DeepKeys } from "@/lib/utils/object";
 import { generateProjectId } from "./generate-project-id";
-
-export type QueryResult<
-	T extends Record<string, unknown> = Record<string, unknown>,
-> = {
-	path: string;
-	type: string;
-	frontmatter?: Record<string, unknown>;
-	types: string[];
-	body?: string | null;
-} & T;
-
-export type ReadResult<
-	T extends Record<string, unknown> = Record<string, unknown>,
-> = {
-	file: {
-		path: string;
-	};
-	frontmatter?: Record<string, unknown>;
-	types: string[];
-	body?: string | null;
-} & T;
-
-export type QueryResultGroup<
-	T extends Record<string, unknown> = Record<string, unknown>,
-> = {
-	key: string;
-	results: QueryResult<T>[];
-};
 
 export type TaskType = TaskNotesTask & {
 	id?: string;
@@ -104,6 +76,19 @@ export type Project = {
 export type TaskFields = DeepKeys<Task>;
 export type ProjectFields = DeepKeys<Project>;
 
+// TODO: Remove this
+function mapStatusValue(value?: string): TaskStatus {
+	if (value === "Completada") {
+		return "done";
+	}
+	
+	if (value === "En Progreso") {
+		return "in-progress";
+	}
+
+	return "open";
+}
+
 export function fromTaskNote(
 	fieldDefs: Record<
 		keyof ExtendedTaskNotesTask,
@@ -119,7 +104,7 @@ export function fromTaskNote(
 		id: task[fieldDefs.id.key] as string,
 		path: path ?? "" as string,
 		name: task[fieldDefs.title.key] as string ?? (path ? basename(path, extname(path)) : "") as string,
-		status: task[fieldDefs.status.key] as TaskStatus ?? fieldDefs.status.field.default as TaskStatus,
+		status: mapStatusValue(task[fieldDefs.status.key] as string ?? fieldDefs.status.field.default),
 		projects: task[fieldDefs.projects.key] as string[],
 		priority: task[fieldDefs.priority.key] as string,
 		timeEntries: task[fieldDefs.timeEntries.key] as TaskTimeEntry[],
@@ -157,33 +142,6 @@ export function fromTaskNoteResultGroup(
 	return {
 		key: group.key,
 		items: group.results.map(r => fromTaskNoteResult(fieldDefs, r)),
-	};
-}
-
-export function toTask(
-	task: QueryResult<TaskType> | ReadResult<TaskType>,
-): Task {
-	const path = "path" in task ? task.path : task.file.path;
-	return {
-		id: task.id,
-		path,
-		name: basename(path, extname(path)),
-		status: task.status ?? "open",
-		projects: task.projects,
-		priority: task.priority,
-		timeEntries: task.timeEntries,
-		timeEstimate: task.timeEstimate,
-		blockedBy: task.blockedBy,
-		block: task.block,
-		contexts: task.contexts,
-		tags: task.tags,
-	};
-}
-
-export function toTaskGroup(group: QueryResultGroup<TaskType>): Group<Task> {
-	return {
-		key: group.key,
-		items: group.results.map(toTask),
 	};
 }
 

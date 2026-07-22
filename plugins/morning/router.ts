@@ -10,12 +10,19 @@ const morning = router({
 		})
 		.input(
 			z.object({
-				fields: datatypes.fields,
 				format: datatypes.format,
+				skipCache: z.boolean().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
-			return morningBriefQuery(input.fields, input.format);
+			return morningBriefQuery(
+				{
+					format: input.format,
+				},
+				{
+					skipCache: input.skipCache,
+				},
+			);
 		}),
 });
 

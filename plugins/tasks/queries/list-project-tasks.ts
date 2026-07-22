@@ -9,52 +9,59 @@ import type { PaginationParams } from "@/lib/utils/pagination";
 import type { Format } from "@/lib/utils/render";
 
 import {
-  formatTasks,
-  formatTasksGroups,
-  listProjectTasks,
-  MDBASE_COLLECTION_ROOT,
-  type TaskFields,
+	formatTasks,
+	formatTasksGroups,
+	MDBASE_COLLECTION_ROOT,
 } from "../lib";
+import { listTasks, type TaskFields } from "../lib/tasks";
 
 const CACHE_TTL = ms("2h");
 const CACHE_KEY = "listProjectTasksQuery";
 
 type ListProjectTasksQueryArgs = {
-  projectName: string;
-  fields?: TaskFields[];
-  format?: Format;
-  groupBy?: GroupByParams;
-  pagination?: PaginationParams;
+	projectName: string;
+	fields?: TaskFields[];
+	format?: Format;
+	groupBy?: GroupByParams;
+	pagination?: PaginationParams;
 };
 export const listProjectTasksQuery = memo(
-  async function listProjectTasksQuery({
-    projectName,
-    fields = ["name", "timeEstimate", "priority"],
-    format = "md",
-    groupBy,
-    pagination,
-  }: ListProjectTasksQueryArgs): Promise<string> {
-    let out = "";
+	async function listProjectTasksQuery({
+		projectName,
+		fields = ["name", "timeEstimate", "priority"],
+		format = "md",
+		groupBy,
+		pagination,
+	}: ListProjectTasksQueryArgs): Promise<string> {
+		let out = "";
 
-    await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
-    const { t } = await getTranslations("tasks");
+		await using db = await Mdbase.open(MDBASE_COLLECTION_ROOT);
+		const { t } = await getTranslations("tasks");
 
-    const { data, groups, page } = await listProjectTasks(db, {
-      projectName,
-      pagination,
-      groupBy,
-    });
+		const { data, groups, page } = await listTasks(db, {
+			filters: {
+				projects: projectName,
+			},
+			groupBy,
+			pagination,
+		});
 
-    out += `${t("messages.unreadCount", { total: page.total })}\n\n`;
+		if (format === "json") {
+			return JSON.stringify({ data, groups, page });
+		}
 
-    if (groups) {
-      out += await formatTasksGroups(groups, format, fields);
-    } else if (data) {
-      out += await formatTasks(data, format, fields);
-    }
+		if (format !== "csv") {
+			out += `${t("messages.unreadCount", { total: page.total })}\n\n`;
+		}
 
-    return out;
-  },
-  CACHE_TTL,
-  CACHE_KEY,
+		if (groups) {
+			out += await formatTasksGroups(groups, format, fields);
+		} else if (data) {
+			out += await formatTasks(data, format, fields);
+		}
+
+		return out;
+	},
+	CACHE_TTL,
+	CACHE_KEY,
 );

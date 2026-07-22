@@ -26,6 +26,6 @@ export function createAppRouter() {
 // Export a base router type for CLI compiler and tooling type safety
 const baseRouter = router({
 	cache: cacheRouter,
-	plugins: pluginsRouter,
+	plugin: pluginsRouter,
 });
 export type AppRouter = typeof baseRouter;

@@ -1,7 +1,8 @@
 import type { OAuth2Client } from "google-auth-library";
+import type { calendar_v3 } from "googleapis";
 import { google } from "googleapis";
 
-import type { CalendarClient } from "./types";
+export type CalendarClient = calendar_v3.Calendar;
 
 export function createClient(auth: OAuth2Client): CalendarClient {
 	if (!auth) {

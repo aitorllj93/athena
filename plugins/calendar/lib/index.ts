@@ -1,5 +1,4 @@
+export * from "./calendars";
 export * from "./client";
+export * from "./events";
 export * from "./format";
-export * from "./list-calendars";
-export * from "./list-upcoming";
-export * from "./types";

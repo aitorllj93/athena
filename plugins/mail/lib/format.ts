@@ -1,5 +1,3 @@
-import he from "he";
-import EmailReplyParser from "node-email-reply-parser";
 
 import { getTranslations } from "@/lib/i18n";
 import { formatDistance } from "@/lib/utils/date";
@@ -9,13 +7,9 @@ import {
 	render,
 } from "@/lib/utils/render";
 
-import { SPECIAL_USE_EMOJIS } from "./constants";
-import type {
-	MailBox,
-	MailBoxFields,
-	MailMessage,
-	MailMessageFields,
-} from "./types";
+import { type MailBox, type MailBoxFields, SPECIAL_USE_EMOJIS } from "./boxes";
+import type { MailMessage, MailMessageFields } from "./messages";
+import { EmailReplyParser, he } from "./parse";
 
 type FieldMap = {
 	[K in MailMessageFields]: DisplayFieldDefinition<MailMessage, K>;

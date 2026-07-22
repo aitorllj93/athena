@@ -7,7 +7,7 @@ const weather = router({
 			description: "Display the forecast for today"
 		})
 		.query(async () => {
-			return getForecastQuery();
+			return getForecastQuery({});
 		}),
 });
 

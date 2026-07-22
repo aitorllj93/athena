@@ -4,17 +4,18 @@ import { memo } from "@/lib/cache";
 import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
 import type { TaskNotesFieldFilters } from "@/lib/providers/mdbase/tasknotes";
+
 import { formatISODate, today } from "@/lib/utils/date";
 import type { GroupByParams } from "@/lib/utils/group";
 import type { PaginationParams } from "@/lib/utils/pagination";
 import type { Format } from "@/lib/utils/render";
+
 import {
 	formatTasks,
 	formatTasksGroups,
 	MDBASE_COLLECTION_ROOT,
-	type TaskFields,
 } from "../lib";
-import { listTasks } from "../lib/list-tasks";
+import { listTasks, type TaskFields } from "../lib/tasks";
 
 const CACHE_TTL = ms("2h");
 const CACHE_KEY = "listScheduledTasksQuery";
@@ -46,12 +47,16 @@ export const listScheduledTasksQuery = memo(
 		const { data, groups, page } = await listTasks(db, {
 			filters: {
 				isActive: true,
-				isDated: referenceDate,
+				isPast: referenceDate,
 				...filters,
 			},
 			groupBy,
 			pagination,
 		});
+
+		if (format === "json") {
+			return JSON.stringify({ data, groups, page });
+		}
 
 		out += `${t("messages.unreadCount", { total: page.total })}\n\n`;
 

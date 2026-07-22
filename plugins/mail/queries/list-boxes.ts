@@ -4,9 +4,12 @@ import { memo } from "@/lib/cache";
 import { getAccessToken, getUser } from "@/lib/providers/google/auth";
 import type { PaginationParams } from "@/lib/utils/pagination";
 import type { Format } from "@/lib/utils/render";
-import { createClient, formatMailBoxes, type MailBoxFields } from "../lib";
-import { INBOX } from "../lib/constants";
-import { listBoxes } from "../lib/list-boxes";
+import {
+	formatMailBoxes,
+	ImapClient,
+	listMailBoxes,
+	type MailBoxFields,
+} from "../lib";
 
 const CACHE_TTL = ms("7d");
 const CACHE_KEY = "ListBoxesQueryArgs";
@@ -27,26 +30,20 @@ export const listBoxesQuery = memo(
 		const accessToken = getAccessToken();
 		const user = getUser();
 
-		const mailClient = createClient({
+		await using imap = await ImapClient.open({
 			user,
 			accessToken,
 		});
 
-		await mailClient.connect();
+		const { data } = await listMailBoxes(imap.client, {
+			pagination,
+		});
 
-		const lock = await mailClient.getMailboxLock(INBOX);
-
-		try {
-			const { data } = await listBoxes(mailClient, {
-				pagination,
-			});
-
-			out += await formatMailBoxes(data, format, fields);
-		} finally {
-			lock.release();
+		if (format === "json") {
+			return JSON.stringify({ data });
 		}
 
-		await mailClient.logout();
+		out += await formatMailBoxes(data, format, fields);
 
 		return out;
 	},

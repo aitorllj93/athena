@@ -8,12 +8,16 @@ import {
 	archiveTaskCommand,
 	completeTaskCommand,
 	createTaskCommand,
+	trackTaskCommand,
 	updateTaskCommand,
 } from "./commands";
-import { trackTaskCommand } from "./commands/track-task";
-import type { ProjectFields, TaskFields } from "./lib";
-import { listProjectTasksQuery, listScheduledTasksQuery } from "./queries";
-import { listProjectsQuery } from "./queries/list-projects";
+import type { ProjectFields } from "./lib/projects";
+import type { TaskFields } from "./lib/tasks";
+import {
+	listProjectsQuery,
+	listProjectTasksQuery,
+	listScheduledTasksQuery,
+} from "./queries";
 
 const offset = z
 	.union([z.string(), z.number()])

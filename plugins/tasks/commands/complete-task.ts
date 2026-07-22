@@ -2,7 +2,9 @@ import { cleanCache } from "@/lib/cache";
 import { logEvent } from "@/lib/events";
 import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
-import { completeTask, MDBASE_COLLECTION_ROOT } from "../lib";
+
+import { MDBASE_COLLECTION_ROOT } from "../lib";
+import { completeTask } from "../lib/tasks";
 
 type CompleteTaskCommandArgs = {
 	archive?: boolean;

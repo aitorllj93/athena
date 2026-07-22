@@ -1,8 +1,10 @@
 import { logEvent } from "@/lib/events";
 import { getTranslations } from "@/lib/i18n";
 import { Mdbase } from "@/lib/providers/mdbase";
+
 import { MDBASE_COLLECTION_ROOT } from "../lib";
-import { trackTask } from "../lib/track-task";
+import { trackTask } from "../lib/tasks";
+
 
 type TrackTaskCommandArgs = {
 	name: string;

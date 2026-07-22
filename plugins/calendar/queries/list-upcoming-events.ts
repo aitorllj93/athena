@@ -40,6 +40,10 @@ export const listUpcomingEventsQuery = memo(
 			pagination,
 		});
 
+		if (format === "json") {
+			return JSON.stringify({ data, groups});
+		}
+
 		if (groups) {
 			out += await formatCalendarEventsGroups(groups, format, fields);
 		} else if (data) {

@@ -1,7 +1,8 @@
 import z from "zod";
 import { datatypes } from "@/app/common";
 import { procedure, router } from "@/lib/trpc";
-import { confirmAssistanceCommand } from "./commands/confirm-assistance";
+
+import { confirmAssistanceCommand } from "./commands";
 import type { CalendarEventFields } from "./lib";
 import { listUpcomingEventsQuery } from "./queries";
 

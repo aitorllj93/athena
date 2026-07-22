@@ -2,13 +2,19 @@ import ms from "ms";
 
 import { memo } from "@/lib/cache";
 import { getGeolocation } from "@/lib/geolocation";
+import type { Format } from "@/lib/utils/render";
 import { formatPlaceAddressShort, reverseLocation } from "../lib";
 
 const CACHE_TTL = ms("7d");
 const CACHE_KEY = "getAddressQuery";
 
+type GetAddressQueryArgs = {
+	format?: Format;
+};
 export const getAddressQuery = memo(
-	async function getAddressQuery(): Promise<string> {
+	async function getAddressQuery({
+		format = "md",
+	}: GetAddressQueryArgs): Promise<string> {
 		let out = "";
 
 		const { lat, lng } = await getGeolocation();
@@ -22,10 +28,14 @@ export const getAddressQuery = memo(
 			lng,
 		});
 
+		if (format === "json") {
+			return JSON.stringify({ data });
+		}
+
 		out = formatPlaceAddressShort(data);
 
 		return out;
 	},
 	CACHE_TTL,
-	CACHE_KEY
+	CACHE_KEY,
 );

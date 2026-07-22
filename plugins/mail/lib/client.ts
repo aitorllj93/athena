@@ -1,23 +1,49 @@
-import { ImapFlow, type ImapFlowOptions } from "imapflow";
+import { ImapFlow, type ImapFlowOptions, type MailboxLockObject } from "imapflow";
 
 import { getLogger } from "@/lib/logger";
 
-import type { MailClient } from "./types";
+export type MailClient = ImapFlow;
 
 const logger = getLogger("imap");
 
-export function createClient(auth: ImapFlowOptions["auth"]): MailClient {
-	if (!auth) {
-		throw new Error("Could not initialise mailClient");
+export class ImapClient {
+	
+	private lockObject?: MailboxLockObject;
+
+	private constructor(
+		public readonly client: ImapFlow,
+	) {}
+	
+	static async open(auth?: ImapFlowOptions["auth"]) {
+		if (!auth) {
+			throw new Error("Missing Imap auth credentials");
+		}
+
+		const client = new ImapFlow({
+			host: "imap.gmail.com",
+			port: 993,
+			secure: true,
+			logger,
+			auth,
+		});
+
+		await client.connect();
+
+		return new ImapClient(client);
 	}
 
-	const client = new ImapFlow({
-		host: "imap.gmail.com",
-		port: 993,
-		secure: true,
-		logger,
-		auth,
-	});
+	public async lock(box: string) {
+		this.lockObject = await this.client.getMailboxLock(box);
+	}
 
-	return client;
+	public unlock() {
+		this.lockObject?.release();
+		delete this.lockObject;
+	}
+
+	async [Symbol.asyncDispose]() {
+		this.unlock();
+		await this.client.logout();
+		await this.client.close();
+	}
 }
