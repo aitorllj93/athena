@@ -57,6 +57,8 @@ export const dateEquals = (field: string, value: string) =>
 	`date(${field}) == ${value}`;
 export const dateLower = (field: string, value: string) =>
 	`date(${field}) < ${value}`;
+export const dateLowerOrEqual = (field: string, value: string) =>
+	`date(${field}) <= ${value}`;
 export const arrContains = (field: string, value: string) =>
 	`${field}.contains(${value})`;
 

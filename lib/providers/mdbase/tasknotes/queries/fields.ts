@@ -1,7 +1,7 @@
 import {
 	arrContains,
 	dateEquals,
-	dateLower,
+	dateLowerOrEqual,
 	intersection,
 	negation,
 	normalizeQueryValue,
@@ -68,7 +68,7 @@ export const isScheduledPast = (
 	value: string,
 	{ scheduled }: TaskNotesFieldsMapping,
 ): QueryExpression =>
-	dateLower(scheduled.key, normalizeQueryValue(value, scheduled.field));
+	dateLowerOrEqual(scheduled.key, normalizeQueryValue(value, scheduled.field));
 
 export const isDue = (
 	value: string,
@@ -80,7 +80,7 @@ export const isDuePast = (
 	value: string,
 	{ due }: TaskNotesFieldsMapping,
 ): QueryExpression =>
-	dateLower(due.key, normalizeQueryValue(value, due.field));
+	dateLowerOrEqual(due.key, normalizeQueryValue(value, due.field));
 
 export const hasContext = (
 	value: string | string[],

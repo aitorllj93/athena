@@ -72,3 +72,8 @@ export type ExtendedTaskNotesTask = TaskNotesTask & {
   type?: string;
 }
 export type ExtendedTaskNotesFieldRole = keyof Required<ExtendedTaskNotesTask>;
+
+export type TaskNotesFieldDefs = Record<keyof TaskNotesTask | "id" | "type", {
+  key: string;
+  field: FieldDefinition;
+}>;

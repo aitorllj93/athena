@@ -117,3 +117,31 @@ export type TypeDefinition = MdbaseTypeDefinition & {
 	archive_path_pattern?: string;
 	fields?: Record<string, FieldDefinition>;
 };
+
+export type QueryResult<
+	T extends Record<string, unknown> = Record<string, unknown>,
+> = {
+	path: string;
+	type: string;
+	frontmatter?: Record<string, unknown>;
+	types: string[];
+	body?: string | null;
+} & T;
+
+export type ReadResult<
+	T extends Record<string, unknown> = Record<string, unknown>,
+> = {
+	file: {
+		path: string;
+	};
+	frontmatter?: Record<string, unknown>;
+	types: string[];
+	body?: string | null;
+} & T;
+
+export type QueryResultGroup<
+	T extends Record<string, unknown> = Record<string, unknown>,
+> = {
+	key: string;
+	results: QueryResult<T>[];
+};

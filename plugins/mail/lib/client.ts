@@ -29,6 +29,10 @@ export class ImapClient {
 
 		await client.connect();
 
+		client.on("error", (error) => {
+			console.log("error", error)
+		});
+
 		return new ImapClient(client);
 	}
 
@@ -44,6 +48,6 @@ export class ImapClient {
 	async [Symbol.asyncDispose]() {
 		this.unlock();
 		await this.client.logout();
-		await this.client.close();
+		this.client.close();
 	}
 }

@@ -7,6 +7,7 @@ import {
 	deleteMailMessageCommand,
 	markAsSpamMailMessageCommand,
 	readMailMessageCommand,
+	unreadMailMessageCommand,
 } from "./commands";
 import type { MailBoxFields, MailMessageFields } from "./lib";
 import { INBOX } from "./lib";
@@ -122,6 +123,7 @@ const mail = router({
 			z.tuple([
 				z.string().describe("messageId"),
 				z.object({
+					archive: z.boolean().optional(),
 					fields: datatypes.fields,
 					format: datatypes.format.default("mdlist"),
 				}),
@@ -129,6 +131,27 @@ const mail = router({
 		)
 		.mutation(({ input: [messageId, opts] }) => {
 			return readMailMessageCommand({
+				id: messageId,
+				archive: opts.archive,
+				fields: opts.fields as MailMessageFields[],
+				format: opts.format,
+			});
+		}),
+	unread: procedure
+		.meta({
+			description: "mark a message as not Seen",
+		})
+		.input(
+			z.tuple([
+				z.string().describe("messageId"),
+				z.object({
+					fields: datatypes.fields,
+					format: datatypes.format.default("mdlist"),
+				}),
+			]),
+		)
+		.mutation(({ input: [messageId, opts] }) => {
+			return unreadMailMessageCommand({
 				id: messageId,
 				fields: opts.fields as MailMessageFields[],
 				format: opts.format,

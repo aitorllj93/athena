@@ -5,6 +5,7 @@ import {
 	paginate,
 } from "@/lib/utils/pagination";
 import type { MailClient } from "../client";
+import { getUnseenThreadsMessageUids } from "./get-unseen-threads-message-uids";
 import { type MailMessage, toMailMessage } from "./types";
 
 type ListUnreadMailMessagesParams = {
@@ -18,22 +19,22 @@ export async function listUnreadMailMessages(
 	data: MailMessage[];
 	page: Pagination;
 }> {
-	const unseenUids = await client.search({ seen: false }, { uid: true });
-	const { data: uuids, page } = paginate(unseenUids || [], params.pagination);
+	const unseenUids = await getUnseenThreadsMessageUids(client);
 
-	if (uuids.length === 0) {
+	if (unseenUids.length === 0) {
 		return {
 			data: [],
-			page,
+			page: paginate([], params.pagination).page,
 		};
 	}
+
+	const { data: uuids, page } = paginate(unseenUids || [], params.pagination);
 
 	const messages = (
 		await client.fetchAll(
 			uuids,
 			{
 				envelope: true,
-				source: true,
 			},
 			{ uid: true },
 		)
@@ -43,7 +44,7 @@ export async function listUnreadMailMessages(
 		data: orderBy(messages, [
 			{
 				key: "received",
-				order: "desc",
+				order: "asc",
 			},
 		]),
 		page,
