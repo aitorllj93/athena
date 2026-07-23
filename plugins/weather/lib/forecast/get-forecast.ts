@@ -28,7 +28,7 @@ export async function getForecast(params: ForecastParams): Promise<Forecast> {
   );
   url.searchParams.append(
     "hourly",
-    "temperature_2m,weather_code",
+    "temperature_2m,weather_code,is_day",
   );
   url.searchParams.append("timezone", params.geolocation.tzid);
   url.searchParams.append("forecast_days", "1");
